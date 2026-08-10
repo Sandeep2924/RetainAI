@@ -1,52 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Activity, AlertTriangle, CheckCircle, Loader2, LogOut } from 'lucide-react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
+  LineChart, Line
+} from 'recharts';
+import { 
+  Search, AlertTriangle, CheckCircle, Activity, Users, 
+  TrendingDown, TrendingUp, LogOut, FileText, ArrowRight 
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+
+const MOCK_CUSTOMERS = [
+  { id: 'CUST-8832', name: 'Acme Corp', age: 45, login: 2, usage: 12.5, ticket: 1 },
+  { id: 'CUST-1049', name: 'Globex Inc', age: 120, login: 2, usage: 5.0, ticket: 1 },
+  { id: 'CUST-2911', name: 'Soylent Ltd', age: 300, login: 0, usage: 145.2, ticket: 0 },
+  { id: 'CUST-5590', name: 'Initech', age: 14, login: 1, usage: 22.0, ticket: 1 },
+];
+
+const MOCK_HISTORY = [
+  { month: 'Jan', usage: 120, logins: 20 },
+  { month: 'Feb', usage: 110, logins: 18 },
+  { month: 'Mar', usage: 80, logins: 12 },
+  { month: 'Apr', usage: 45, logins: 5 },
+  { month: 'May', usage: 30, logins: 2 },
+  { month: 'Jun', usage: 15, logins: 1 },
+];
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const token = localStorage.getItem('retainai_token');
-
-  const [formData, setFormData] = useState({
-    customer_id: 'CUST-001',
-    account_age_days: 120,
-    login_frequency: 0, 
-    daily_usage_mins: 45.5,
-    last_support_ticket: 0 
-  });
-
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCustomer, setActiveCustomer] = useState(MOCK_CUSTOMERS[0]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
-  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Auto-analyze selected customer
+    analyzeCustomer(activeCustomer);
+  }, [activeCustomer]);
 
   const handleLogout = () => {
     localStorage.removeItem('retainai_token');
     navigate('/login');
   };
 
-  const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
-    }));
-  };
-
-  const handlePredict = async (e) => {
-    e.preventDefault();
+  const analyzeCustomer = async (customer) => {
     setLoading(true);
-    setError('');
-    
     try {
-      const response = await axios.post('http://127.0.0.1:8000/predict', formData, {
+      const payload = {
+        customer_id: customer.id,
+        account_age_days: customer.age,
+        login_frequency: customer.login,
+        daily_usage_mins: customer.usage,
+        last_support_ticket: customer.ticket
+      };
+      const response = await axios.post('http://127.0.0.1:8000/predict', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setResult(response.data);
     } catch (err) {
       if (err.response?.status === 401) handleLogout();
-      setError(err.response?.data?.detail || 'Failed to connect to the prediction API.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -58,90 +74,112 @@ export default function Dashboard() {
     isPositive: value > 0 
   })).sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)) : [];
 
-  const getRiskColorClass = (score) => {
-    if (score >= 0.75) return 'risk-high';
-    if (score >= 0.40) return 'risk-med';
-    return 'risk-low';
+  const getActionRecommendation = (topDriver) => {
+    if (!topDriver) return "Review account history for anomalies.";
+    if (topDriver === 'Login_Frequency') return "Trigger automated re-engagement email sequence offering a free 1-on-1 strategy session.";
+    if (topDriver === 'Daily_Usage_Mins') return "Send feature discovery campaign to highlight unused tools and value-adds.";
+    if (topDriver === 'Last_Support_Ticket') return "Escalate open tickets immediately to Level 2 Support for white-glove resolution.";
+    if (topDriver === 'Account_Age_Days') return "Offer a long-term loyalty discount or upgrade their plan for free for 3 months.";
+    return "Schedule a Customer Success check-in call.";
   };
 
   return (
-    <div className="dashboard-container">
-      <header className="header" style={{ position: 'relative' }}>
-        <button 
-          onClick={handleLogout} 
-          style={{ position: 'absolute', right: 0, top: 0, background: 'transparent', border: '1px solid var(--border-color)', color: 'white', padding: '8px 16px', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        >
-          <LogOut size={16} style={{ marginRight: 8 }}/> Logout
-        </button>
-        <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          RetainAI Dashboard
-        </motion.h1>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-          Real-time Explainable Customer Churn Prediction
-        </motion.p>
-      </header>
+    <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-primary)', overflow: 'hidden' }}>
+      
+      {/* Sidebar: Auto-detected At-Risk Customers */}
+      <div style={{ width: 320, background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border-color)' }}>
+          <h2 style={{ fontSize: '1.2rem', color: 'white', display: 'flex', alignItems: 'center' }}>
+            <Activity size={20} color="var(--accent-cyan)" style={{ marginRight: 10 }} />
+            RetainAI Analyst
+          </h2>
+        </div>
+        
+        <div style={{ padding: 20 }}>
+          <div style={{ position: 'relative', marginBottom: 24 }}>
+            <Search size={16} style={{ position: 'absolute', top: 12, left: 12, color: 'var(--text-muted)' }} />
+            <input 
+              type="text" 
+              placeholder="Search customers..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '10px 10px 10px 36px', color: 'white', outline: 'none' }}
+            />
+          </div>
 
-      <div className="grid">
-        <motion.div className="glass-card" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <h2><Activity size={20} style={{ display: 'inline', marginRight: 8 }}/> Customer Profile</h2>
-          <form onSubmit={handlePredict} style={{ marginTop: 20 }}>
-            <div className="form-group"><label>Customer ID</label><input type="text" name="customer_id" value={formData.customer_id} onChange={handleChange} className="form-input" /></div>
-            <div className="form-group"><label>Account Age (Days)</label><input type="number" name="account_age_days" value={formData.account_age_days} onChange={handleChange} className="form-input" /></div>
-            <div className="form-group"><label>Login Frequency</label>
-              <select name="login_frequency" value={formData.login_frequency} onChange={handleChange} className="form-input">
-                <option value={0}>Daily (0)</option><option value={1}>Weekly (1)</option><option value={2}>Monthly (2)</option>
-              </select>
-            </div>
-            <div className="form-group"><label>Daily Usage (Mins)</label><input type="number" step="0.1" name="daily_usage_mins" value={formData.daily_usage_mins} onChange={handleChange} className="form-input" /></div>
-            <div className="form-group"><label>Support Ticket Status</label>
-              <select name="last_support_ticket" value={formData.last_support_ticket} onChange={handleChange} className="form-input">
-                <option value={0}>Resolved (0)</option><option value={1}>Open/Escalated (1)</option><option value={2}>No Tickets (2)</option>
-              </select>
-            </div>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? <><Loader2 className="spinner" size={18} style={{ marginRight: 8, verticalAlign: 'middle' }}/> Analyzing...</> : 'Analyze Churn Risk'}
-            </button>
-          </form>
-          {error && <div style={{ color: 'var(--accent-rose)', marginTop: 16, textAlign: 'center' }}>{error}</div>}
-        </motion.div>
+          <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12, letterSpacing: 1 }}>
+            ⚠️ Auto-Detected Risk Queue
+          </h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {MOCK_CUSTOMERS.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.id.includes(searchQuery)).map(customer => (
+              <div 
+                key={customer.id}
+                onClick={() => setActiveCustomer(customer)}
+                style={{ 
+                  padding: 16, borderRadius: 8, cursor: 'pointer',
+                  background: activeCustomer.id === customer.id ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${activeCustomer.id === customer.id ? 'var(--accent-cyan)' : 'var(--border-color)'}`
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600, color: 'white' }}>{customer.name}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{customer.id}</span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: customer.login > 0 ? 'var(--accent-rose)' : 'var(--text-muted)' }}>
+                  {customer.login === 2 ? 'Monthly Active (Low)' : customer.login === 1 ? 'Weekly Active' : 'Daily Active'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div style={{ marginTop: 'auto', padding: 20, borderTop: '1px solid var(--border-color)' }}>
+          <button onClick={handleLogout} style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <LogOut size={16} style={{ marginRight: 8 }} /> Sign Out
+          </button>
+        </div>
+      </div>
 
-        <motion.div className="glass-card" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-          {!result && !loading && (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-              <Activity size={48} style={{ opacity: 0.2, marginBottom: 16 }} />
-              <h3>Awaiting Analysis</h3>
-              <p>Run the prediction model to see results.</p>
+      {/* Main Content Area */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '40px 60px' }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={activeCustomer.id}>
+          
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
+            <div>
+              <h1 style={{ fontSize: '2.5rem', margin: 0, color: 'white' }}>{activeCustomer.name}</h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{activeCustomer.id} • Customer for {activeCustomer.age} days</p>
             </div>
-          )}
-
-          {result && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-              <div className="result-box">
-                <h3 style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>Risk Score ({result.customer_id})</h3>
-                <div className={`risk-score ${getRiskColorClass(result.churn_risk_score)}`}>
+            
+            {result && (
+              <div style={{ textAlign: 'right', background: 'var(--bg-glass)', padding: '16px 24px', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Current Churn Risk</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: result.high_risk ? 'var(--accent-rose)' : 'var(--accent-emerald)' }}>
                   {(result.churn_risk_score * 100).toFixed(1)}%
                 </div>
-                {result.high_risk ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-rose)', fontWeight: 600 }}>
-                    <AlertTriangle size={20} style={{ marginRight: 8 }}/> CRITICAL RISK DETECTED
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-emerald)', fontWeight: 600 }}>
-                    <CheckCircle size={20} style={{ marginRight: 8 }}/> HEALTHY ACCOUNT
-                  </div>
-                )}
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 10 }}>Analyzed by: {result.analyzed_by}</div>
               </div>
+            )}
+          </div>
 
-              <div style={{ marginTop: 32 }}>
-                <h3 style={{ marginBottom: 8 }}>SHAP Explainability (Why?)</h3>
-                <div className="shap-chart-container">
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 100, color: 'var(--text-muted)' }}>Analyzing live data...</div>
+          ) : result ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              
+              {/* SHAP Explanation */}
+              <div className="glass-card">
+                <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                  <Activity size={20} style={{ marginRight: 8, color: 'var(--accent-cyan)' }}/> 
+                  Why is this happening? (AI Diagnostics)
+                </h3>
+                <div style={{ height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={shapData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" horizontal={false} />
+                    <BarChart data={shapData} layout="vertical" margin={{ top: 0, right: 0, left: 30, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                       <XAxis type="number" stroke="var(--text-muted)" />
                       <YAxis dataKey="name" type="category" stroke="var(--text-muted)" width={120} tick={{ fontSize: 12 }} />
-                      <Tooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'var(--border-color)', borderRadius: '8px' }} formatter={(value) => [value.toFixed(4), "SHAP Impact"]} />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid var(--border-color)' }} />
                       <Bar dataKey="impact" radius={[0, 4, 4, 0]}>
                         {shapData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.isPositive ? 'var(--accent-rose)' : 'var(--accent-cyan)'} />)}
                       </Bar>
@@ -149,8 +187,54 @@ export default function Dashboard() {
                   </ResponsiveContainer>
                 </div>
               </div>
-            </motion.div>
-          )}
+
+              {/* Action Plan */}
+              <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                  <AlertTriangle size={20} style={{ marginRight: 8, color: 'var(--accent-amber)' }}/> 
+                  Action Plan: What to do next
+                </h3>
+                
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: 24, borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 20 }}>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 8 }}>Primary Risk Driver Detected:</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'white', marginBottom: 16 }}>{result.top_driver.replace(/_/g, ' ')}</div>
+                  
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 8 }}>Recommended Action:</div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                    <ArrowRight size={18} color="var(--accent-emerald)" style={{ marginRight: 10, marginTop: 2 }} />
+                    <span style={{ fontSize: '1.1rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                      {getActionRecommendation(result.top_driver)}
+                    </span>
+                  </div>
+                </div>
+                
+                <button className="btn-primary" style={{ marginTop: 'auto' }}>
+                  Execute Automated Playbook
+                </button>
+              </div>
+
+              {/* Historical Usage Graph */}
+              <div className="glass-card" style={{ gridColumn: '1 / -1' }}>
+                <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                  <TrendingDown size={20} style={{ marginRight: 8, color: 'var(--text-muted)' }}/> 
+                  6-Month Activity History (Simulated)
+                </h3>
+                <div style={{ height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={MOCK_HISTORY} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <XAxis dataKey="month" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid var(--border-color)' }} />
+                      <Line type="monotone" dataKey="usage" name="Usage Mins" stroke="var(--accent-cyan)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                      <Line type="monotone" dataKey="logins" name="Total Logins" stroke="var(--accent-indigo)" strokeWidth={3} dot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+            </div>
+          ) : null}
         </motion.div>
       </div>
     </div>
