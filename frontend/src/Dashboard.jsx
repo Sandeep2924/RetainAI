@@ -5,18 +5,11 @@ import {
   LineChart, Line
 } from 'recharts';
 import { 
-  Search, AlertTriangle, CheckCircle, Activity, Users, 
-  TrendingDown, TrendingUp, LogOut, FileText, ArrowRight 
+  Search, AlertTriangle, CheckCircle, Activity, 
+  TrendingDown, LogOut, ArrowRight 
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
-const MOCK_CUSTOMERS = [
-  { id: 'CUST-8832', name: 'Acme Corp', age: 45, login: 2, usage: 12.5, ticket: 1 },
-  { id: 'CUST-1049', name: 'Globex Inc', age: 120, login: 2, usage: 5.0, ticket: 1 },
-  { id: 'CUST-2911', name: 'Soylent Ltd', age: 300, login: 0, usage: 145.2, ticket: 0 },
-  { id: 'CUST-5590', name: 'Initech', age: 14, login: 1, usage: 22.0, ticket: 1 },
-];
 
 const MOCK_HISTORY = [
   { month: 'Jan', usage: 120, logins: 20 },
@@ -32,47 +25,39 @@ export default function Dashboard() {
   const token = localStorage.getItem('retainai_token');
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCustomer, setActiveCustomer] = useState(MOCK_CUSTOMERS[0]);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [liveCustomers, setLiveCustomers] = useState([]);
+  const [activeCustomer, setActiveCustomer] = useState(null);
 
+  // Poll for live incoming customers every 2 seconds
   useEffect(() => {
-    // Auto-analyze selected customer
-    analyzeCustomer(activeCustomer);
-  }, [activeCustomer]);
+    const fetchLiveEvents = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/recent_events', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const events = response.data.events;
+        setLiveCustomers(events);
+        
+        // Auto-select the first customer if none is selected
+        if (!activeCustomer && events.length > 0) {
+          setActiveCustomer(events[0]);
+        }
+      } catch (err) {
+        if (err.response?.status === 401) handleLogout();
+        console.error(err);
+      }
+    };
+
+    fetchLiveEvents(); // initial fetch
+    const interval = setInterval(fetchLiveEvents, 2000);
+    return () => clearInterval(interval);
+  }, [token, activeCustomer]);
 
   const handleLogout = () => {
     localStorage.removeItem('retainai_token');
     navigate('/login');
   };
-
-  const analyzeCustomer = async (customer) => {
-    setLoading(true);
-    try {
-      const payload = {
-        customer_id: customer.id,
-        account_age_days: customer.age,
-        login_frequency: customer.login,
-        daily_usage_mins: customer.usage,
-        last_support_ticket: customer.ticket
-      };
-      const response = await axios.post('http://127.0.0.1:8000/predict', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setResult(response.data);
-    } catch (err) {
-      if (err.response?.status === 401) handleLogout();
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const shapData = result ? Object.entries(result.shap_explanations).map(([key, value]) => ({
-    name: key.replace(/_/g, ' '),
-    impact: value,
-    isPositive: value > 0 
-  })).sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)) : [];
 
   const getActionRecommendation = (topDriver) => {
     if (!topDriver) return "Review account history for anomalies.";
@@ -83,24 +68,33 @@ export default function Dashboard() {
     return "Schedule a Customer Success check-in call.";
   };
 
+  // Filter customers by search
+  const filteredCustomers = liveCustomers.filter(c => 
+    c.customer_id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-primary)', overflow: 'hidden' }}>
       
-      {/* Sidebar: Auto-detected At-Risk Customers */}
-      <div style={{ width: 320, background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+      {/* Sidebar: Live Stream Feed */}
+      <div style={{ width: 350, background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border-color)' }}>
           <h2 style={{ fontSize: '1.2rem', color: 'white', display: 'flex', alignItems: 'center' }}>
             <Activity size={20} color="var(--accent-cyan)" style={{ marginRight: 10 }} />
-            RetainAI Analyst
+            Live Analyst Feed
           </h2>
+          <p style={{ color: 'var(--accent-emerald)', fontSize: '0.8rem', marginTop: 8, display: 'flex', alignItems: 'center' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', marginRight: 6, animation: 'pulse 2s infinite' }}></span>
+            Monitoring {liveCustomers.length}/100 streams...
+          </p>
         </div>
         
-        <div style={{ padding: 20 }}>
+        <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ position: 'relative', marginBottom: 24 }}>
             <Search size={16} style={{ position: 'absolute', top: 12, left: 12, color: 'var(--text-muted)' }} />
             <input 
               type="text" 
-              placeholder="Search customers..." 
+              placeholder="Search by Customer ID..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '10px 10px 10px 36px', color: 'white', outline: 'none' }}
@@ -108,33 +102,51 @@ export default function Dashboard() {
           </div>
 
           <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12, letterSpacing: 1 }}>
-            ⚠️ Auto-Detected Risk Queue
+            Real-Time Pipeline
           </h3>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {MOCK_CUSTOMERS.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.id.includes(searchQuery)).map(customer => (
-              <div 
-                key={customer.id}
-                onClick={() => setActiveCustomer(customer)}
-                style={{ 
-                  padding: 16, borderRadius: 8, cursor: 'pointer',
-                  background: activeCustomer.id === customer.id ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${activeCustomer.id === customer.id ? 'var(--accent-cyan)' : 'var(--border-color)'}`
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontWeight: 600, color: 'white' }}>{customer.name}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{customer.id}</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: customer.login > 0 ? 'var(--accent-rose)' : 'var(--text-muted)' }}>
-                  {customer.login === 2 ? 'Monthly Active (Low)' : customer.login === 1 ? 'Weekly Active' : 'Daily Active'}
-                </div>
+          <div style={{ overflowY: 'auto', flex: 1, paddingRight: 5, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filteredCustomers.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: 20 }}>
+                {liveCustomers.length === 0 ? "Awaiting live data stream..." : "No matches found."}
               </div>
-            ))}
+            ) : (
+              <AnimatePresence>
+                {filteredCustomers.map(customer => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    key={`${customer.customer_id}-${customer.timestamp}`}
+                    onClick={() => setActiveCustomer(customer)}
+                    style={{ 
+                      padding: 16, borderRadius: 8, cursor: 'pointer',
+                      background: activeCustomer?.customer_id === customer.customer_id ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${activeCustomer?.customer_id === customer.customer_id ? 'var(--accent-cyan)' : 'var(--border-color)'}`,
+                      borderLeft: `4px solid ${customer.high_risk ? 'var(--accent-rose)' : 'var(--accent-emerald)'}`
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                        {customer.customer_id}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{customer.timestamp}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.85rem', color: customer.high_risk ? 'var(--accent-rose)' : 'var(--accent-emerald)', fontWeight: 600 }}>
+                        {(customer.churn_risk_score * 100).toFixed(1)}% Risk
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                        {customer.top_driver ? customer.top_driver.replace(/_/g, ' ') : 'N/A'}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            )}
           </div>
         </div>
         
-        <div style={{ marginTop: 'auto', padding: 20, borderTop: '1px solid var(--border-color)' }}>
+        <div style={{ padding: 20, borderTop: '1px solid var(--border-color)' }}>
           <button onClick={handleLogout} style={{ width: '100%', background: 'transparent', border: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <LogOut size={16} style={{ marginRight: 8 }} /> Sign Out
           </button>
@@ -143,28 +155,27 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '40px 60px' }}>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={activeCustomer.id}>
-          
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
-            <div>
-              <h1 style={{ fontSize: '2.5rem', margin: 0, color: 'white' }}>{activeCustomer.name}</h1>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{activeCustomer.id} • Customer for {activeCustomer.age} days</p>
-            </div>
+        {activeCustomer ? (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={activeCustomer.customer_id}>
             
-            {result && (
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
+              <div>
+                <h1 style={{ fontSize: '2.5rem', margin: 0, color: 'white' }}>{activeCustomer.customer_id}</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: 8 }}>
+                  Account Age: {activeCustomer.req_data?.account_age_days} days | 
+                  Usage: {activeCustomer.req_data?.daily_usage_mins} mins/day
+                </p>
+              </div>
+              
               <div style={{ textAlign: 'right', background: 'var(--bg-glass)', padding: '16px 24px', borderRadius: 12, border: '1px solid var(--border-color)' }}>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Current Churn Risk</div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: result.high_risk ? 'var(--accent-rose)' : 'var(--accent-emerald)' }}>
-                  {(result.churn_risk_score * 100).toFixed(1)}%
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Calculated Churn Risk</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: activeCustomer.high_risk ? 'var(--accent-rose)' : 'var(--accent-emerald)' }}>
+                  {(activeCustomer.churn_risk_score * 100).toFixed(1)}%
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: 100, color: 'var(--text-muted)' }}>Analyzing live data...</div>
-          ) : result ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
               
               {/* SHAP Explanation */}
@@ -175,13 +186,19 @@ export default function Dashboard() {
                 </h3>
                 <div style={{ height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={shapData} layout="vertical" margin={{ top: 0, right: 0, left: 30, bottom: 0 }}>
+                    <BarChart 
+                      data={Object.entries(activeCustomer.shap_explanations || {}).map(([k, v]) => ({ name: k.replace(/_/g, ' '), impact: v, isPositive: v > 0 })).sort((a,b) => Math.abs(b.impact) - Math.abs(a.impact))} 
+                      layout="vertical" 
+                      margin={{ top: 0, right: 0, left: 30, bottom: 0 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                       <XAxis type="number" stroke="var(--text-muted)" />
                       <YAxis dataKey="name" type="category" stroke="var(--text-muted)" width={120} tick={{ fontSize: 12 }} />
                       <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid var(--border-color)' }} />
                       <Bar dataKey="impact" radius={[0, 4, 4, 0]}>
-                        {shapData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.isPositive ? 'var(--accent-rose)' : 'var(--accent-cyan)'} />)}
+                        {Object.entries(activeCustomer.shap_explanations || {}).map((_, i) => (
+                          <Cell key={i} fill={Object.values(activeCustomer.shap_explanations)[i] > 0 ? 'var(--accent-rose)' : 'var(--accent-cyan)'} />
+                        ))}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
@@ -195,15 +212,17 @@ export default function Dashboard() {
                   Action Plan: What to do next
                 </h3>
                 
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: 24, borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 20 }}>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: 24, borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)', flex: 1, marginBottom: 20 }}>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 8 }}>Primary Risk Driver Detected:</div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'white', marginBottom: 16 }}>{result.top_driver.replace(/_/g, ' ')}</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'white', marginBottom: 16 }}>
+                    {activeCustomer.top_driver ? activeCustomer.top_driver.replace(/_/g, ' ') : 'N/A'}
+                  </div>
                   
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 8 }}>Recommended Action:</div>
                   <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                     <ArrowRight size={18} color="var(--accent-emerald)" style={{ marginRight: 10, marginTop: 2 }} />
                     <span style={{ fontSize: '1.1rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
-                      {getActionRecommendation(result.top_driver)}
+                      {getActionRecommendation(activeCustomer.top_driver)}
                     </span>
                   </div>
                 </div>
@@ -217,7 +236,7 @@ export default function Dashboard() {
               <div className="glass-card" style={{ gridColumn: '1 / -1' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
                   <TrendingDown size={20} style={{ marginRight: 8, color: 'var(--text-muted)' }}/> 
-                  6-Month Activity History (Simulated)
+                  6-Month Activity History (User Trends)
                 </h3>
                 <div style={{ height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -234,9 +253,24 @@ export default function Dashboard() {
               </div>
 
             </div>
-          ) : null}
-        </motion.div>
+          </motion.div>
+        ) : (
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+            <Activity size={64} style={{ opacity: 0.1, marginBottom: 20 }} />
+            <h2>Waiting for live stream data...</h2>
+            <p>Ensure your Python stream simulator is running.</p>
+          </div>
+        )}
       </div>
+      
+      {/* Global CSS for pulse animation */}
+      <style>{`
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+          70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+      `}</style>
     </div>
   );
 }
