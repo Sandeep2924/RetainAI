@@ -9,11 +9,12 @@ RetainAI is a multi-tenant, cloud-native platform designed to predict customer c
 *   **Real-time Event Ingestion:** Captures usage, billing, and support activity via an Apache Kafka streaming pipeline.
 *   **Continuous Feature Engineering:** Computes rolling behavioral features (e.g., engagement decay, ticket backlog) continuously using Redis.
 *   **Explainable ML (SHAP):** Predicts churn probability via XGBoost/LightGBM and provides human-readable SHAP feature attributions (explaining exactly what drove the score).
-*   **Automated Retention:** Triggers automated, reason-aware interventions (e.g., discount offers, priority support) based on the risk drivers.
-*   **Multi-Tenant Dashboard:** A full-stack React dashboard with live WebSocket updates, cohort analytics, and role-based access control (RBAC).
+*   **Agentic AI (OpenAI LLM):** An autonomous agent that reads the ML diagnostic reasoning and generates highly personalized retention strategies and dynamic emails to prevent churn.
+*   **Automated Retention:** Triggers automated, reason-aware interventions (e.g., booking optimization sessions, priority support) based on the risk drivers.
+*   **Multi-Tenant Dashboard:** A full-stack React dashboard with live streaming updates, cohort analytics, and search filtering.
 
 ## 📄 Documentation
-*   **Software Requirements Specification (SRS):** Detailed requirements, architecture, and system models can be found in `RetainAI_SRS.docx`.
+*   **Architecture & PRD:** Detailed requirements and system models can be found in `architecture.md` and `prd.md`.
 
 ## 🛠️ Tech Stack Architecture
 *   **Event Streaming:** Apache Kafka
