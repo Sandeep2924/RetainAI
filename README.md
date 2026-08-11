@@ -13,9 +13,6 @@ RetainAI is a multi-tenant, cloud-native platform designed to predict customer c
 *   **Automated Retention:** Triggers automated, reason-aware interventions (e.g., booking optimization sessions, priority support) based on the risk drivers.
 *   **Multi-Tenant Dashboard:** A full-stack React dashboard with live streaming updates, cohort analytics, and search filtering.
 
-## 📄 Documentation
-*   **Architecture & PRD:** Detailed requirements and system models can be found in `architecture.md` and `prd.md`.
-
 ## 🛠️ Tech Stack Architecture
 *   **Event Streaming:** Apache Kafka
 *   **Data Stores:** PostgreSQL (Multi-tenant data), Redis (Low-latency feature store)
