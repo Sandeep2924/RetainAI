@@ -1,0 +1,508 @@
+customer_id,ticket_timestamp,subject,status
+068b54d7-7461-4d1c-885e-f5b43efed384,2026-05-28 05:43:37,Feature request,resolved
+5d1e924a-5232-4255-8df9-610e13465816,2026-06-20 01:08:37,Login issue,resolved
+5d1e924a-5232-4255-8df9-610e13465816,2026-05-16 10:51:37,Slow dashboard load,resolved
+c07c0a8a-bac0-47f9-b93d-57d61490a610,2026-05-18 10:49:37,Billing question,resolved
+67855f87-2552-4273-9aff-1b2060638673,2026-07-16 20:33:37,Feature request,open
+14315c24-aa38-40f9-8eaa-bf5f242107d9,2026-05-21 00:31:37,Can't find export button,pending
+14315c24-aa38-40f9-8eaa-bf5f242107d9,2026-07-08 05:36:37,Feature request,open
+592b837b-6df9-4267-8009-b8a7d1c63e01,2026-06-24 23:42:37,Slow dashboard load,open
+592b837b-6df9-4267-8009-b8a7d1c63e01,2026-06-18 01:44:37,Slow dashboard load,resolved
+3cbddf97-c9ff-4701-a979-2d2d341aa8fc,2026-07-02 22:16:37,Slow dashboard load,pending
+7ac4c7f9-94a3-454b-afe5-0f5399679504,2026-06-18 13:59:37,Feature request,pending
+a37b8137-7b88-4273-b2ed-b9993192e791,2026-06-08 22:51:37,Billing question,open
+037ca95f-820c-4fdb-83a1-f491edd89c08,2026-05-25 11:43:37,Billing question,open
+be0fff09-d876-4715-918d-6b6508f652eb,2026-06-05 02:41:37,Slow dashboard load,pending
+be0fff09-d876-4715-918d-6b6508f652eb,2026-06-08 21:54:37,Login issue,resolved
+bd7ab3f0-bffa-430c-ac66-9f2117926e9e,2026-08-04 03:07:37,How do I add teammates?,open
+bd7ab3f0-bffa-430c-ac66-9f2117926e9e,2026-06-17 17:19:37,Billing question,open
+03507060-2553-4558-aa6c-a21aa72cb840,2026-06-29 08:44:37,Feature request,resolved
+03507060-2553-4558-aa6c-a21aa72cb840,2026-07-26 18:40:37,Slow dashboard load,pending
+c0efe1bc-4798-4944-b956-aa3845c7677a,2026-07-29 17:10:37,Billing question,resolved
+c0efe1bc-4798-4944-b956-aa3845c7677a,2026-07-26 00:36:37,Slow dashboard load,resolved
+95d0a1a4-1c40-415e-b41d-cb1be763f447,2026-07-31 18:28:37,Login issue,open
+a74565ec-394a-44b5-93c1-f28e6a081d80,2026-08-08 17:52:37,Login issue,open
+46739327-a118-4564-80fc-16ba39a18129,2026-06-08 06:05:37,Login issue,pending
+46739327-a118-4564-80fc-16ba39a18129,2026-07-13 14:01:37,Can't find export button,resolved
+defd667c-3b78-4283-9f80-5efc4cade554,2026-05-20 23:26:37,How do I add teammates?,open
+defd667c-3b78-4283-9f80-5efc4cade554,2026-06-20 06:01:37,Slow dashboard load,open
+64eb9d06-c46f-41e7-ba93-2cce0b1726b6,2026-05-22 20:58:37,Login issue,resolved
+9477c74b-fc76-42b8-b9af-7f66f0dd64b2,2026-06-28 23:57:37,Slow dashboard load,open
+daf2d5c7-3576-45e8-8304-28ac337d2fd5,2026-07-20 07:36:37,Feature request,pending
+f9961985-6563-49ac-8fc5-ba6092d7f149,2026-06-18 03:03:37,Can't find export button,pending
+f9961985-6563-49ac-8fc5-ba6092d7f149,2026-07-31 17:04:37,How do I add teammates?,open
+be2af142-ce1a-461b-955b-61be6a842be7,2026-07-26 09:16:37,Login issue,resolved
+be2af142-ce1a-461b-955b-61be6a842be7,2026-05-26 11:57:37,Feature request,resolved
+48ec32bc-1afa-485c-aa67-2d5da7703402,2026-05-31 01:16:37,Can't find export button,resolved
+f94f0ba4-f238-4394-b918-cc72ec9f70bc,2026-07-15 09:54:37,Billing question,open
+5f4f3a88-95e4-4499-98ca-0f37197e7d47,2026-05-17 12:12:37,Feature request,open
+5f4f3a88-95e4-4499-98ca-0f37197e7d47,2026-06-09 20:26:37,Can't find export button,resolved
+0fa0b474-6adb-4723-8acc-899fbd69e615,2026-05-14 08:17:37,Can't find export button,resolved
+caef9733-6f7f-4503-9660-8c35495f765c,2026-08-05 21:05:37,Billing question,resolved
+caef9733-6f7f-4503-9660-8c35495f765c,2026-06-10 04:40:37,Slow dashboard load,resolved
+8dcff16d-9d50-4ba5-a7e1-3cfb997f089f,2026-06-19 01:32:37,Can't find export button,open
+8dcff16d-9d50-4ba5-a7e1-3cfb997f089f,2026-07-27 18:50:37,How do I add teammates?,resolved
+b1550860-620e-485d-b8d6-6e9ef02d96a4,2026-07-29 17:15:37,Slow dashboard load,open
+b1550860-620e-485d-b8d6-6e9ef02d96a4,2026-06-06 03:41:37,Can't find export button,open
+7dc0c175-44a1-44c5-bebe-d28d3c2b4aca,2026-07-12 23:35:37,Can't find export button,open
+4dda9424-bed7-4762-a510-6ac32dc692f3,2026-07-19 08:44:37,Login issue,resolved
+18680669-ddb4-47ef-9151-a24ec993f075,2026-05-13 10:36:37,Login issue,resolved
+18680669-ddb4-47ef-9151-a24ec993f075,2026-05-22 03:40:37,Slow dashboard load,pending
+0b27d8e2-ee30-40f0-8752-251df023674e,2026-06-12 18:39:37,Can't find export button,resolved
+0b27d8e2-ee30-40f0-8752-251df023674e,2026-06-01 02:58:37,Feature request,open
+121c3215-7ba2-4984-90ae-7eec5fc9c6ca,2026-07-15 19:43:37,Can't find export button,pending
+121c3215-7ba2-4984-90ae-7eec5fc9c6ca,2026-06-29 13:16:37,Slow dashboard load,pending
+c6a10a5d-eb98-4cf5-bbee-344d85e75500,2026-07-23 12:08:37,Can't find export button,pending
+c6a10a5d-eb98-4cf5-bbee-344d85e75500,2026-07-07 15:49:37,Login issue,pending
+42c1999c-562f-4287-aa3f-2c4b7bc2616e,2026-05-30 08:41:37,Feature request,resolved
+e8f8e13b-0df2-426b-ae14-85a0f22503eb,2026-06-19 07:22:37,Billing question,pending
+e8f8e13b-0df2-426b-ae14-85a0f22503eb,2026-06-05 22:16:37,Login issue,open
+e50536fe-971f-4140-a68a-679bd25fde32,2026-07-08 22:30:37,Slow dashboard load,open
+c3c131d4-3407-4cd1-b37f-1f299c36096a,2026-08-08 23:03:37,Can't find export button,resolved
+59484897-fdc8-44c0-a6ee-020ffb371306,2026-06-15 04:12:37,Can't find export button,resolved
+d6616808-7a72-4f5c-8d16-274ef16368e2,2026-08-10 04:54:37,Can't find export button,pending
+d6616808-7a72-4f5c-8d16-274ef16368e2,2026-07-05 19:06:37,Feature request,open
+d79d9751-cff8-4201-b5e6-7883566fd3ee,2026-07-11 19:33:37,How do I add teammates?,resolved
+d79d9751-cff8-4201-b5e6-7883566fd3ee,2026-06-15 21:42:37,Billing question,open
+31943c00-6222-475b-b8e5-f73b716ac78b,2026-07-27 22:12:37,How do I add teammates?,pending
+f1c180b9-6c66-416f-9809-f6cc0ddac29c,2026-07-24 08:22:37,How do I add teammates?,open
+42df406b-5018-4643-8da1-96237a0014c0,2026-06-15 12:12:37,Login issue,pending
+42df406b-5018-4643-8da1-96237a0014c0,2026-07-26 06:05:37,Slow dashboard load,open
+8f4ee33d-3a1c-4756-a7c3-8bd174cc43ad,2026-06-20 02:17:37,How do I add teammates?,pending
+dfe79a11-1f47-4fdd-ada4-30baa3650d6d,2026-07-12 19:28:37,Billing question,pending
+dfe79a11-1f47-4fdd-ada4-30baa3650d6d,2026-07-01 07:21:37,Slow dashboard load,open
+a1974816-6b40-4638-8bea-78a554f15522,2026-06-05 23:03:37,Can't find export button,resolved
+a1974816-6b40-4638-8bea-78a554f15522,2026-05-26 09:42:37,Feature request,resolved
+1fb10d61-95bf-49c3-b0c9-d899d0928f51,2026-07-19 13:17:37,Feature request,open
+1fb10d61-95bf-49c3-b0c9-d899d0928f51,2026-06-15 06:29:37,Slow dashboard load,open
+e13cd79e-4a38-43df-8feb-c6fd37395555,2026-06-03 14:40:37,Slow dashboard load,resolved
+1a587a8b-7c97-46f1-a686-98e8100a0e57,2026-05-28 12:32:37,Login issue,pending
+f77b5305-e15f-4452-8775-a9532110d202,2026-07-08 11:21:37,Billing question,pending
+7297e1af-1323-4611-a023-3a004778f01d,2026-07-17 19:41:37,Billing question,pending
+7297e1af-1323-4611-a023-3a004778f01d,2026-06-30 04:24:37,Feature request,resolved
+c59fafcf-609a-4fdc-8568-85371412048d,2026-06-22 05:00:37,Feature request,open
+7f32dff9-a7ed-43f4-9c6d-1af86b6bdf17,2026-05-21 01:38:37,Slow dashboard load,resolved
+fe2c857c-6537-4b90-aa2b-d17d61757993,2026-07-15 21:32:37,Billing question,open
+fe2c857c-6537-4b90-aa2b-d17d61757993,2026-06-25 10:57:37,Login issue,pending
+efee253f-8fa9-4b80-8599-6d0e36995175,2026-05-27 03:41:37,Billing question,pending
+efee253f-8fa9-4b80-8599-6d0e36995175,2026-06-28 12:00:37,Slow dashboard load,resolved
+085f267c-5aec-47f4-bdc8-a54f576c9e11,2026-05-12 10:22:37,Billing question,open
+085f267c-5aec-47f4-bdc8-a54f576c9e11,2026-07-09 07:36:37,Can't find export button,resolved
+85d1a2ad-8500-46d0-a9d7-c1d29f568c44,2026-06-08 23:11:37,Billing question,resolved
+85d1a2ad-8500-46d0-a9d7-c1d29f568c44,2026-07-06 22:06:37,How do I add teammates?,open
+e49c9672-c4d2-4391-9e7c-8a54df1a2111,2026-05-30 13:07:37,Can't find export button,pending
+e49c9672-c4d2-4391-9e7c-8a54df1a2111,2026-08-06 09:39:37,Slow dashboard load,resolved
+a8289053-ddea-48c9-bdbc-cc3404ecc4ad,2026-07-31 13:12:37,Login issue,open
+a8289053-ddea-48c9-bdbc-cc3404ecc4ad,2026-07-11 18:15:37,Feature request,resolved
+8c492ebc-9ae4-4584-9dd5-55b727721446,2026-07-10 06:24:37,How do I add teammates?,resolved
+ea412d7c-ef49-4da8-b79b-2e8b8089d6f5,2026-07-03 11:43:37,How do I add teammates?,open
+ea412d7c-ef49-4da8-b79b-2e8b8089d6f5,2026-05-25 13:04:37,How do I add teammates?,resolved
+80bf349a-fddb-4d6d-a72a-50f62294a2b9,2026-07-07 01:10:37,Can't find export button,open
+96962aac-209b-4579-a33f-e99dfcaf7c1a,2026-06-23 22:13:37,Billing question,pending
+96962aac-209b-4579-a33f-e99dfcaf7c1a,2026-06-16 22:50:37,Feature request,open
+08ec70b7-b329-4db8-aa16-d1b3736a4d4f,2026-07-20 13:07:37,Slow dashboard load,pending
+08ec70b7-b329-4db8-aa16-d1b3736a4d4f,2026-07-05 04:13:37,Can't find export button,pending
+8f321092-cb86-4a84-bee2-a5343b536e13,2026-06-06 17:19:37,Billing question,pending
+98221bc5-307f-424f-9d94-e3b6b02d2d05,2026-06-18 15:20:37,Billing question,open
+98221bc5-307f-424f-9d94-e3b6b02d2d05,2026-06-25 07:48:37,How do I add teammates?,resolved
+249aa8d3-5aad-4b19-9e0b-66f79a9d7be9,2026-08-04 04:41:37,Feature request,resolved
+249aa8d3-5aad-4b19-9e0b-66f79a9d7be9,2026-05-15 06:17:37,How do I add teammates?,open
+615bf6c9-1290-4266-9221-2671e5c8b8f9,2026-05-20 05:15:37,How do I add teammates?,resolved
+27bca0d5-7bcc-4fe5-bf93-c955241c6816,2026-07-20 05:21:37,Billing question,resolved
+d37576da-7128-4d3c-9d01-c5ffb7bd378f,2026-07-19 05:30:37,Login issue,open
+58d7c51e-ce39-4383-8abb-9d778aacc71a,2026-06-30 16:34:37,Login issue,resolved
+58d7c51e-ce39-4383-8abb-9d778aacc71a,2026-07-30 17:28:37,Slow dashboard load,resolved
+703e8cb1-b47a-444c-bcba-ff1dfdbff520,2026-07-29 16:14:37,How do I add teammates?,pending
+703e8cb1-b47a-444c-bcba-ff1dfdbff520,2026-07-26 15:33:37,Slow dashboard load,open
+60983901-ce29-49f4-8e78-0a4696176dd0,2026-06-30 20:48:37,Slow dashboard load,open
+53fefe35-4515-4a8f-b0ec-f1b7bd66b58a,2026-06-19 01:29:37,Can't find export button,open
+53fefe35-4515-4a8f-b0ec-f1b7bd66b58a,2026-07-06 11:42:37,Feature request,resolved
+5008f124-cd85-418d-a649-4170dc2bd022,2026-05-20 04:50:37,Login issue,resolved
+ff7a9a15-73f2-48b4-9ecb-b27bf8d4d79a,2026-08-05 23:30:37,Feature request,pending
+ff7a9a15-73f2-48b4-9ecb-b27bf8d4d79a,2026-06-07 06:02:37,Feature request,open
+91a68053-0621-48f1-a8d8-d476a73915f5,2026-05-14 17:24:37,How do I add teammates?,resolved
+0c7eaec9-ff53-4b30-9c35-21ae38d7e8dd,2026-05-31 15:26:37,Login issue,resolved
+0c7eaec9-ff53-4b30-9c35-21ae38d7e8dd,2026-07-25 06:58:37,Feature request,pending
+0d5c3971-f433-43a5-817c-a3c09f9fb51a,2026-07-17 12:22:37,Can't find export button,open
+0d5c3971-f433-43a5-817c-a3c09f9fb51a,2026-06-05 00:14:37,Slow dashboard load,open
+0016b14c-da3e-41a0-ace3-2571d8f28e6f,2026-05-31 16:44:37,Billing question,open
+7cca8ae0-53c9-410c-b1b9-c0dec6ca92b1,2026-07-24 12:21:37,How do I add teammates?,pending
+7cca8ae0-53c9-410c-b1b9-c0dec6ca92b1,2026-05-15 08:50:37,Billing question,open
+1baaac13-2a06-479b-be24-5aa54960f5fb,2026-07-12 05:25:37,Slow dashboard load,open
+1baaac13-2a06-479b-be24-5aa54960f5fb,2026-07-21 16:55:37,How do I add teammates?,pending
+7f78655b-db3c-449b-8051-633d1a3b1326,2026-06-11 01:49:37,Billing question,pending
+9c022bb1-f506-445f-b465-289ff95b0b04,2026-07-03 16:03:37,Login issue,open
+c9cfed25-fbcd-407c-be1f-e2807b39b8eb,2026-06-17 05:06:37,Slow dashboard load,resolved
+86597ebe-ceb6-410a-8e40-32f2d19dbc5c,2026-05-26 12:16:37,Feature request,pending
+86597ebe-ceb6-410a-8e40-32f2d19dbc5c,2026-08-10 10:52:37,How do I add teammates?,pending
+bbb8a3a7-3f0e-46fb-af82-1361f14860d0,2026-06-01 16:40:37,Can't find export button,resolved
+17e44e32-d680-43df-a315-56a62f5a5427,2026-06-21 22:13:37,Can't find export button,pending
+bb7b8799-c20b-4adc-bbe3-1629da49beff,2026-08-06 06:19:37,Can't find export button,open
+72c19964-af42-4b50-9861-ee9c6a6a9dd4,2026-06-20 23:35:37,Feature request,pending
+72c19964-af42-4b50-9861-ee9c6a6a9dd4,2026-06-14 13:44:37,Login issue,pending
+36c5678e-3c45-43f8-972b-722d65afd899,2026-06-15 15:30:37,Slow dashboard load,pending
+36c5678e-3c45-43f8-972b-722d65afd899,2026-06-02 22:18:37,How do I add teammates?,open
+dc7929cc-2b6a-4df0-8d47-93f9fa8c3bdb,2026-08-01 20:42:37,Slow dashboard load,resolved
+26730da4-ea57-44d0-9e7c-79f01d310151,2026-07-25 16:22:37,How do I add teammates?,open
+26730da4-ea57-44d0-9e7c-79f01d310151,2026-07-12 02:34:37,Billing question,resolved
+53de08f4-a3d4-4d29-a10e-e067e61f9bba,2026-07-07 00:46:37,Can't find export button,pending
+313a1c9f-4350-4dab-ac84-533dee477503,2026-07-03 11:59:37,Slow dashboard load,resolved
+f918ebe8-67d7-4789-b78a-aa636c06bfc3,2026-07-03 10:13:37,How do I add teammates?,pending
+f918ebe8-67d7-4789-b78a-aa636c06bfc3,2026-07-20 18:20:37,Login issue,resolved
+211d3459-3e07-49db-87e5-ab7a448182e0,2026-08-06 06:20:37,Slow dashboard load,resolved
+33cce1ba-ecf0-4359-ac07-b54e9eecae6e,2026-06-08 08:55:37,How do I add teammates?,resolved
+33cce1ba-ecf0-4359-ac07-b54e9eecae6e,2026-07-20 02:32:37,Feature request,pending
+d0338ae2-1ff0-4220-a852-ed3380546cf3,2026-05-26 06:28:37,Can't find export button,pending
+d0338ae2-1ff0-4220-a852-ed3380546cf3,2026-06-26 22:25:37,Slow dashboard load,open
+6efa0660-5985-4619-8ea2-83c1cc034bf3,2026-06-29 11:28:37,Feature request,open
+010492b3-561f-42e6-863c-40523d750ff8,2026-08-02 19:15:37,How do I add teammates?,resolved
+010492b3-561f-42e6-863c-40523d750ff8,2026-07-13 17:43:37,Can't find export button,resolved
+91534361-0492-4f05-b189-acb52d0270b6,2026-06-04 01:28:37,Feature request,pending
+e54405e8-2273-4aa3-a3a0-76ae8b87acd3,2026-07-08 11:14:37,How do I add teammates?,resolved
+e54405e8-2273-4aa3-a3a0-76ae8b87acd3,2026-08-01 15:14:37,How do I add teammates?,resolved
+02289e0c-0c3b-4fb5-96f0-4342cdfdd468,2026-07-10 09:27:37,Login issue,open
+02289e0c-0c3b-4fb5-96f0-4342cdfdd468,2026-07-05 01:48:37,Feature request,open
+83c4a0f7-8c63-4423-b9a3-96ba79228e41,2026-08-04 02:14:37,How do I add teammates?,pending
+83c4a0f7-8c63-4423-b9a3-96ba79228e41,2026-05-19 19:43:37,Slow dashboard load,resolved
+908bb014-37eb-4cdf-85d1-5b1cc4591cfd,2026-05-14 01:27:37,Can't find export button,open
+908bb014-37eb-4cdf-85d1-5b1cc4591cfd,2026-08-01 09:59:37,Login issue,resolved
+d2b63b2e-0bd8-4c56-8f8a-56bc0aa5dff2,2026-06-04 00:50:37,Slow dashboard load,resolved
+d2b63b2e-0bd8-4c56-8f8a-56bc0aa5dff2,2026-06-11 12:00:37,Feature request,resolved
+fb23c75a-9a6a-420f-800c-048de923ca0f,2026-05-31 14:55:37,Billing question,open
+fb23c75a-9a6a-420f-800c-048de923ca0f,2026-08-07 16:15:37,Slow dashboard load,open
+bff7488c-0696-4075-95d7-540a0fa37145,2026-06-29 04:23:37,Login issue,pending
+820054d9-3750-4844-b63e-eccec0e6218c,2026-06-18 03:49:37,How do I add teammates?,open
+1d0e978c-94ba-45d1-a26a-f2a6dff4f2ce,2026-06-03 05:41:37,Feature request,resolved
+1d0e978c-94ba-45d1-a26a-f2a6dff4f2ce,2026-05-27 11:53:37,How do I add teammates?,open
+78ba00dd-6803-467e-a0a3-682f4aa69621,2026-08-11 09:11:37,Feature request,resolved
+78ba00dd-6803-467e-a0a3-682f4aa69621,2026-08-09 08:22:37,Feature request,open
+f410650a-8634-458a-bfdd-c4a3f1275c88,2026-07-28 19:36:37,Can't find export button,pending
+f410650a-8634-458a-bfdd-c4a3f1275c88,2026-05-15 02:43:37,Billing question,open
+2aeb78ea-16f0-4636-9e9e-99a01bd7a560,2026-05-29 06:29:37,Login issue,resolved
+3d00d11f-5cd9-49df-a7c8-b6f8b4fdb6e9,2026-07-21 21:19:37,How do I add teammates?,open
+71e95291-2b7a-4b4e-80f3-93cf106882c6,2026-06-23 19:38:37,Slow dashboard load,open
+1c973d1c-1e5e-4c70-ad59-c12e5b298a5a,2026-05-23 06:21:37,Slow dashboard load,resolved
+1c973d1c-1e5e-4c70-ad59-c12e5b298a5a,2026-07-29 07:02:37,Billing question,pending
+1e480f8e-63ac-46b2-8a02-e020d593d2c3,2026-07-26 07:10:37,How do I add teammates?,resolved
+096fede7-8470-4f83-9ee6-a2b77cdc31e5,2026-06-11 21:06:37,Billing question,pending
+53547069-1f7d-4f62-af34-8438b2ece131,2026-06-09 03:50:37,Login issue,resolved
+4b9b4d68-57bc-432a-b79f-ce6232a85ce9,2026-07-29 13:52:37,Slow dashboard load,open
+4b9b4d68-57bc-432a-b79f-ce6232a85ce9,2026-06-29 22:35:37,Slow dashboard load,pending
+55690ebe-24d8-4af3-8336-d6358141ae5e,2026-07-12 02:21:37,How do I add teammates?,resolved
+55690ebe-24d8-4af3-8336-d6358141ae5e,2026-06-07 18:22:37,Slow dashboard load,pending
+f92e7db1-ecd1-4779-b04a-9d8240d5f642,2026-06-30 07:45:37,Feature request,open
+492bbf3f-4043-46b4-a22f-fd6e4190202c,2026-07-18 10:20:37,How do I add teammates?,pending
+6b0f1a5f-0b23-460a-a6e2-18278bbfd89d,2026-08-10 21:45:37,Slow dashboard load,open
+bdbab6cc-9b70-48aa-8336-d5118e9bd568,2026-06-17 03:48:37,Slow dashboard load,pending
+bdbab6cc-9b70-48aa-8336-d5118e9bd568,2026-07-26 03:01:37,Feature request,resolved
+4014fc73-ed35-439a-8f13-1b63d8fcd478,2026-07-15 22:08:37,Slow dashboard load,open
+a7e729c0-15bc-426c-b4c4-c93d29417be1,2026-07-09 03:00:37,Can't find export button,open
+a7e729c0-15bc-426c-b4c4-c93d29417be1,2026-06-30 09:53:37,Slow dashboard load,open
+ed207729-f304-4311-b3e1-92ce26cca057,2026-07-04 09:10:37,How do I add teammates?,open
+ed207729-f304-4311-b3e1-92ce26cca057,2026-08-07 21:16:37,Login issue,pending
+cea071c6-1042-4e0c-80d3-c631e7667b0a,2026-06-27 08:51:37,How do I add teammates?,pending
+55b16f89-e750-4cef-a356-d343c927d6fc,2026-05-13 19:40:37,Slow dashboard load,open
+55b16f89-e750-4cef-a356-d343c927d6fc,2026-07-21 12:04:37,How do I add teammates?,resolved
+16982188-2221-4667-8751-908a7cfdb252,2026-05-30 01:00:37,Slow dashboard load,resolved
+e08ef5d0-24ca-4ef2-a4ca-696cf3235c67,2026-06-28 22:48:37,Can't find export button,open
+f892ad4a-f585-4a48-8d7d-e1ab91fb4c1c,2026-08-10 17:23:37,Can't find export button,pending
+87ad18db-dee3-4d64-8483-f6938628429c,2026-07-31 06:32:37,Can't find export button,resolved
+fe378c17-da89-4670-9d11-ecdb8a653d9a,2026-05-22 17:34:37,Login issue,open
+fe378c17-da89-4670-9d11-ecdb8a653d9a,2026-07-26 12:29:37,Slow dashboard load,open
+99c2b496-a92f-4c7e-9b4e-13b74110b449,2026-06-05 20:05:37,Slow dashboard load,pending
+99c2b496-a92f-4c7e-9b4e-13b74110b449,2026-07-20 17:00:37,How do I add teammates?,pending
+1fde5ab1-0bca-420d-9682-8450f11ca7ee,2026-06-28 20:54:37,Can't find export button,resolved
+eff03bc1-1da6-4b5f-8867-a0eb7670a49f,2026-05-18 05:17:37,Login issue,open
+9ceb3eb2-913e-4b50-98bb-122fc6ed2d75,2026-07-03 17:49:37,Billing question,resolved
+9ceb3eb2-913e-4b50-98bb-122fc6ed2d75,2026-06-20 03:02:37,Login issue,pending
+3b323003-07ec-4d70-8aa7-2c46d335e59d,2026-08-05 23:02:37,Login issue,pending
+6782fab3-4eed-4944-95f9-c85df3bc8194,2026-05-30 21:45:37,Can't find export button,open
+5deae017-a857-42ba-b651-657ef79a5537,2026-06-03 06:18:37,Can't find export button,pending
+f0f280c1-1c58-4842-8473-0713d1f61afb,2026-05-14 14:47:37,Billing question,open
+f0f280c1-1c58-4842-8473-0713d1f61afb,2026-07-25 14:16:37,Billing question,pending
+c16aabd1-a0b5-46a3-b09c-4aa0cbee9151,2026-06-18 21:34:37,Feature request,resolved
+c16aabd1-a0b5-46a3-b09c-4aa0cbee9151,2026-07-22 12:54:37,Feature request,pending
+462c8b4f-2d39-4e99-a696-243c79b2f11c,2026-07-19 19:33:37,Slow dashboard load,resolved
+6cb486d1-2886-4ea6-9262-4d7b77a0819f,2026-07-14 16:35:37,Login issue,resolved
+39f6238b-4460-4738-a16e-b0bcc13856e0,2026-05-17 13:12:37,Slow dashboard load,pending
+39f6238b-4460-4738-a16e-b0bcc13856e0,2026-06-25 13:49:37,How do I add teammates?,pending
+94defea5-d7f5-4b8f-a73a-03cb3b860038,2026-07-26 07:42:37,Billing question,pending
+94defea5-d7f5-4b8f-a73a-03cb3b860038,2026-05-18 13:41:37,Can't find export button,open
+3767c349-abcf-40fc-adfb-903c72267f4b,2026-07-22 09:15:37,Feature request,resolved
+1f7378c3-7ac3-461d-97ad-5ed2426ab696,2026-07-15 18:49:37,Feature request,pending
+0f636b3d-c57b-47af-a845-f4857b75249d,2026-07-24 20:33:37,Feature request,resolved
+863a3867-fcd6-446b-9d56-a49f10a29d6f,2026-07-24 09:17:37,Feature request,pending
+4f6b72f2-ec08-4d53-9d36-693810d268b5,2026-06-08 12:49:37,How do I add teammates?,open
+4f6b72f2-ec08-4d53-9d36-693810d268b5,2026-07-31 18:20:37,How do I add teammates?,open
+a96b016e-7bb9-4a84-9f1f-5c5a14176804,2026-07-25 06:17:37,Login issue,pending
+b0cd1707-4270-4ba7-9464-c1b86ea9286b,2026-07-18 14:15:37,How do I add teammates?,open
+d9bdfe0d-720e-4cbb-b836-d1d068c3bedf,2026-05-25 13:58:37,Login issue,pending
+d9bdfe0d-720e-4cbb-b836-d1d068c3bedf,2026-08-02 12:48:37,Billing question,pending
+34d1eac0-1f76-4ea4-a59b-a82ca2388edd,2026-08-02 06:39:37,Login issue,resolved
+54c2994e-2779-4f53-83a8-96ea0e0f5ed3,2026-06-24 00:50:37,Billing question,resolved
+54c2994e-2779-4f53-83a8-96ea0e0f5ed3,2026-06-20 15:42:37,How do I add teammates?,resolved
+c0398004-897b-4fa3-a303-b7045c80175d,2026-06-23 20:43:37,Login issue,pending
+e6930d54-a940-44f6-b4d0-af5174184858,2026-07-22 13:07:37,How do I add teammates?,open
+51177bd7-7753-4123-b6f4-70aea9f2ecd2,2026-05-14 03:18:37,Slow dashboard load,open
+51177bd7-7753-4123-b6f4-70aea9f2ecd2,2026-07-16 02:38:37,Billing question,resolved
+ae57df1c-e886-4e78-97b8-db45dd844100,2026-06-27 10:53:37,Feature request,pending
+d4a30053-d626-4b34-adc4-72765920e868,2026-07-31 02:45:37,Slow dashboard load,pending
+d4a30053-d626-4b34-adc4-72765920e868,2026-08-09 09:06:37,Can't find export button,pending
+e29e8568-6743-46e5-8818-4b36b9a669f3,2026-05-27 07:43:37,Feature request,open
+e29e8568-6743-46e5-8818-4b36b9a669f3,2026-05-27 20:16:37,Feature request,resolved
+e8c2cc02-0183-4b44-b5b1-652478450123,2026-06-21 15:22:37,Slow dashboard load,pending
+e8c2cc02-0183-4b44-b5b1-652478450123,2026-05-15 04:00:37,How do I add teammates?,pending
+0d088a1a-1a8c-47bc-b1e3-2883567c8d57,2026-05-22 08:30:37,Billing question,open
+0d088a1a-1a8c-47bc-b1e3-2883567c8d57,2026-07-20 15:24:37,Login issue,open
+247162ce-3d2f-42d6-8137-18cef4c9bca7,2026-06-12 02:02:37,How do I add teammates?,open
+be8c5181-2071-426c-8fa9-914887b56150,2026-06-17 20:04:37,Feature request,pending
+cd4831fa-dc93-4c2e-8342-f4668c99d6c6,2026-06-16 10:33:37,How do I add teammates?,pending
+9072713f-561f-4c1b-952b-f2d759535fb8,2026-05-14 08:21:37,Login issue,resolved
+af15cd0d-ea79-4271-9081-036e922ea5f0,2026-08-07 13:19:37,Billing question,pending
+af15cd0d-ea79-4271-9081-036e922ea5f0,2026-07-03 00:43:37,Login issue,resolved
+1466024d-73f3-450e-923f-03ceaf2b7055,2026-06-15 22:19:37,Slow dashboard load,resolved
+016a1918-9928-49de-9f4a-1588fe2609b7,2026-06-28 21:10:37,Billing question,resolved
+016a1918-9928-49de-9f4a-1588fe2609b7,2026-08-08 13:14:37,Can't find export button,resolved
+1c268f25-b778-47b8-a771-9f7e60da1dea,2026-07-22 22:00:37,Feature request,resolved
+4214ecda-8da6-4223-b3a4-8b5088f112d2,2026-06-19 18:11:37,Can't find export button,open
+4214ecda-8da6-4223-b3a4-8b5088f112d2,2026-07-26 02:52:37,Feature request,open
+ed3a6729-d740-48c4-a778-fa2c93b249c4,2026-06-29 21:41:37,Slow dashboard load,resolved
+946a67c0-37d4-40a2-a93f-fce64719ac14,2026-05-29 17:47:37,How do I add teammates?,pending
+946a67c0-37d4-40a2-a93f-fce64719ac14,2026-05-27 02:28:37,How do I add teammates?,open
+2aa6c6ac-29cd-4339-a980-45d54a9e1c01,2026-07-23 16:12:37,Slow dashboard load,open
+2aa6c6ac-29cd-4339-a980-45d54a9e1c01,2026-07-02 22:23:37,How do I add teammates?,resolved
+e712a971-51f3-4719-98ae-e7c23834811b,2026-06-23 17:26:37,Billing question,resolved
+59332ee4-3c32-4aa1-9387-cad2cead7a3d,2026-07-13 02:18:37,Feature request,open
+59332ee4-3c32-4aa1-9387-cad2cead7a3d,2026-06-09 10:14:37,Can't find export button,open
+60a5539b-35a0-48b6-b120-73dd9363c902,2026-08-01 20:17:37,How do I add teammates?,pending
+90176b19-8557-409e-b6db-b3d4eb7d7d11,2026-08-02 06:00:37,Can't find export button,resolved
+f3d83220-9c55-4023-8625-ca2683bf61d8,2026-07-13 18:44:37,Login issue,resolved
+ebbce64b-fad4-48a8-b9d7-d5a7576c3b1e,2026-07-22 18:41:37,Can't find export button,open
+1f78d6c3-06a5-48b0-99ed-fd76e7f3aedb,2026-07-16 15:18:37,Slow dashboard load,open
+1f78d6c3-06a5-48b0-99ed-fd76e7f3aedb,2026-07-13 18:32:37,Login issue,open
+78629e5c-49f0-4e2c-8f98-4adc3ce61431,2026-07-08 09:51:37,How do I add teammates?,pending
+7d6a7d77-310e-45d8-9a87-6d3676b42396,2026-05-24 23:54:37,Can't find export button,resolved
+7d6a7d77-310e-45d8-9a87-6d3676b42396,2026-05-27 08:33:37,How do I add teammates?,open
+243476f9-df80-4b34-b378-faf1fea9fd48,2026-07-24 14:17:37,Slow dashboard load,resolved
+243476f9-df80-4b34-b378-faf1fea9fd48,2026-07-24 18:49:37,Billing question,open
+3369a884-5c03-4377-8d1f-dd8bb17b2e61,2026-06-03 22:30:37,Feature request,open
+3369a884-5c03-4377-8d1f-dd8bb17b2e61,2026-07-01 19:45:37,Billing question,resolved
+1c62576f-9192-4287-ade0-532bb7099d00,2026-06-15 05:33:37,How do I add teammates?,open
+fd1c3960-573e-4860-bf5f-2e504ddc170f,2026-07-14 19:39:37,Can't find export button,resolved
+fd1c3960-573e-4860-bf5f-2e504ddc170f,2026-06-13 23:16:37,Login issue,open
+a330f5e7-5003-4d9c-b8e7-3703f7868c27,2026-06-21 09:00:37,Slow dashboard load,resolved
+c7fa72f8-2f38-4862-a987-b4edc2f9fb20,2026-07-22 02:02:37,Can't find export button,open
+e9bba54d-69dd-4472-ae63-36b1d132907c,2026-07-30 13:45:37,Login issue,pending
+f602cd5e-d109-4fc2-9896-ebcc00326866,2026-07-29 11:05:37,Can't find export button,pending
+848a19c6-7332-4526-84e3-e8c339d70689,2026-06-07 06:19:37,Slow dashboard load,pending
+848a19c6-7332-4526-84e3-e8c339d70689,2026-06-14 23:44:37,Feature request,pending
+9391bffb-ce5e-42eb-96d5-06ade40b040b,2026-07-28 23:46:37,Billing question,resolved
+4112be90-c380-4aef-acf8-6f8cf8ae9aeb,2026-05-21 16:46:37,Feature request,resolved
+4112be90-c380-4aef-acf8-6f8cf8ae9aeb,2026-07-26 12:59:37,Login issue,open
+389a8f24-ff1b-4aaa-838e-4144f0dd764e,2026-06-10 06:36:37,Billing question,pending
+389a8f24-ff1b-4aaa-838e-4144f0dd764e,2026-07-26 09:10:37,Billing question,pending
+225276bd-3c75-4eee-a102-449e2a69ee49,2026-08-10 09:45:37,Billing question,resolved
+225276bd-3c75-4eee-a102-449e2a69ee49,2026-05-30 01:36:37,Can't find export button,open
+0770faad-5068-4b61-9438-2a2e3eb0abfb,2026-07-11 16:11:37,Can't find export button,open
+7040dbe1-3c64-4132-bc4c-064b5aa37f47,2026-07-16 14:23:37,Slow dashboard load,pending
+7040dbe1-3c64-4132-bc4c-064b5aa37f47,2026-08-07 06:43:37,Billing question,open
+503fa887-dea2-4a19-979c-aa5afb280088,2026-08-05 07:02:37,Can't find export button,resolved
+503fa887-dea2-4a19-979c-aa5afb280088,2026-07-09 09:59:37,Login issue,pending
+94df7f41-6d75-41b1-8f86-8ae152380a9a,2026-06-26 18:47:37,Slow dashboard load,open
+a63357ba-caa9-4ddb-a941-03e3fc844a9a,2026-06-15 08:26:37,How do I add teammates?,resolved
+a63357ba-caa9-4ddb-a941-03e3fc844a9a,2026-06-12 15:25:37,Slow dashboard load,pending
+118e5e5a-ce31-4940-9d33-b8f1ef2edd91,2026-07-19 08:12:37,Feature request,pending
+770b7ca0-12e9-44c6-9b73-810d34dc8141,2026-08-09 11:40:37,Can't find export button,pending
+ad65b0d8-d706-4572-b96e-272d4566dd87,2026-07-01 16:11:37,Login issue,resolved
+48acb123-f942-4db4-9796-2a1881d89af3,2026-07-31 00:42:37,Feature request,open
+48acb123-f942-4db4-9796-2a1881d89af3,2026-06-07 09:15:37,Billing question,resolved
+e4b26e61-7250-46f5-97fb-3b2fd84f63ef,2026-07-11 22:28:37,Feature request,open
+15e3bcb4-f9c8-4169-b9a6-75bd48ca40ea,2026-05-16 22:34:37,Feature request,open
+fc80bef4-4403-4b1a-93a6-05429018dd3a,2026-05-22 14:48:37,Can't find export button,pending
+fc80bef4-4403-4b1a-93a6-05429018dd3a,2026-07-03 23:10:37,Login issue,resolved
+c67483a9-271a-413d-89e4-db6914dbf596,2026-07-04 04:25:37,Feature request,open
+c67483a9-271a-413d-89e4-db6914dbf596,2026-07-30 12:20:37,Slow dashboard load,open
+1b6aeb80-19b1-4e2c-a645-269c6730c5dc,2026-07-10 08:30:37,How do I add teammates?,pending
+1b6aeb80-19b1-4e2c-a645-269c6730c5dc,2026-05-29 17:50:37,Login issue,pending
+643de5bd-3bf0-4bc0-a714-773490483489,2026-06-18 18:48:37,Slow dashboard load,resolved
+643de5bd-3bf0-4bc0-a714-773490483489,2026-07-06 08:20:37,Can't find export button,resolved
+154e6baf-83d7-401f-bdf3-83b902fb7d7e,2026-08-10 23:27:37,Billing question,open
+1b869a35-adb9-4b86-9cca-5a9ed578a44c,2026-08-08 17:14:37,Login issue,resolved
+1b869a35-adb9-4b86-9cca-5a9ed578a44c,2026-07-11 04:44:37,Login issue,open
+ac9b3fca-e4bb-45f6-a700-8246616ed708,2026-05-13 21:11:37,Can't find export button,pending
+7eede3cc-f27e-4252-b12e-d9b6115b9eb8,2026-06-08 08:47:37,Login issue,resolved
+7eede3cc-f27e-4252-b12e-d9b6115b9eb8,2026-06-06 09:11:37,Billing question,open
+fac17453-534c-4d66-b9cb-5e1caeca9e0e,2026-07-26 11:52:37,Can't find export button,pending
+b79038fa-2c24-4a31-9514-4460b4d8de5e,2026-05-21 07:32:37,Login issue,resolved
+b79038fa-2c24-4a31-9514-4460b4d8de5e,2026-06-28 12:40:37,Billing question,pending
+2be0b323-87cf-4dc8-bfa9-48a28c1e3a7e,2026-06-27 09:42:37,Can't find export button,pending
+2be0b323-87cf-4dc8-bfa9-48a28c1e3a7e,2026-05-23 18:53:37,Can't find export button,pending
+6e02414c-71fa-4def-946d-28340b04879c,2026-07-01 04:01:37,Feature request,open
+6e02414c-71fa-4def-946d-28340b04879c,2026-06-12 11:47:37,How do I add teammates?,pending
+29d547a7-5d93-46bc-a07c-470adca87cb5,2026-06-02 20:50:37,Feature request,resolved
+29d547a7-5d93-46bc-a07c-470adca87cb5,2026-07-31 23:04:37,Billing question,pending
+8202cfe9-9386-4c76-8880-cd8f1865180e,2026-07-23 18:15:37,Feature request,resolved
+8202cfe9-9386-4c76-8880-cd8f1865180e,2026-05-19 00:04:37,Billing question,resolved
+ba6eef7b-4c70-4b57-8e4b-2383cce4193c,2026-07-06 20:30:37,How do I add teammates?,pending
+ba6eef7b-4c70-4b57-8e4b-2383cce4193c,2026-07-13 04:39:37,Feature request,resolved
+adce29e5-8343-43c1-8f96-1af5aa1cd569,2026-05-18 21:45:37,Feature request,resolved
+52e432c2-d52c-4667-9471-a72fa6d8864f,2026-05-22 00:43:37,Can't find export button,open
+622773df-6575-4c4a-a10f-071cea37e060,2026-07-22 23:46:37,How do I add teammates?,pending
+9ef9c227-1864-4dbc-a6dd-d8e5ff5989d8,2026-06-10 12:36:37,Slow dashboard load,pending
+bef9b510-baad-43ab-b311-da43f2c0ed39,2026-06-12 05:07:37,Feature request,resolved
+bef9b510-baad-43ab-b311-da43f2c0ed39,2026-07-27 14:57:37,Slow dashboard load,pending
+9780f404-af05-4d70-bcc1-f4a2f7dc578e,2026-06-09 05:25:37,Slow dashboard load,pending
+c06bf9fa-bcf6-49d2-bc9f-923086e6d29f,2026-06-27 21:47:37,Feature request,pending
+c06bf9fa-bcf6-49d2-bc9f-923086e6d29f,2026-08-01 13:26:37,Billing question,resolved
+dfdc423c-cc23-49dd-85ea-7339db56cf5e,2026-06-16 06:08:37,Billing question,pending
+3cca0860-8c09-400a-ac71-370cf2e6562f,2026-05-20 01:31:37,Slow dashboard load,open
+3cca0860-8c09-400a-ac71-370cf2e6562f,2026-07-10 09:23:37,Feature request,resolved
+4ae2aef1-fb3a-4b9d-ac9f-803574e6cabd,2026-08-01 15:06:37,Feature request,resolved
+4ae2aef1-fb3a-4b9d-ac9f-803574e6cabd,2026-06-16 16:17:37,Login issue,open
+3e4b74c6-bd39-46bd-ab7a-930e64936739,2026-08-01 12:40:37,Slow dashboard load,open
+933563df-14e8-4135-a45a-c418e18a2cc7,2026-05-18 00:56:37,Billing question,pending
+41090716-9deb-4e2e-9060-abf250008eb5,2026-08-08 13:52:37,How do I add teammates?,resolved
+14b9a3c4-f82b-4421-842e-0051696a6130,2026-05-25 17:37:37,Can't find export button,open
+d97868d5-b956-4886-bf8e-6b41d9dc2161,2026-07-05 07:15:37,Slow dashboard load,open
+04784b2a-a3a0-4179-afd8-1d7ceea07770,2026-07-10 22:32:37,Can't find export button,pending
+bf24037f-97b9-445a-932e-6840f5ca5aa0,2026-07-11 07:06:37,How do I add teammates?,pending
+bf24037f-97b9-445a-932e-6840f5ca5aa0,2026-07-14 21:22:37,Feature request,pending
+931f826c-5cba-4cf5-bd0a-567c8baa226d,2026-06-04 21:52:37,Slow dashboard load,resolved
+19b5e8a0-3798-425b-bb07-0d8e79708bb2,2026-05-20 10:08:37,Slow dashboard load,open
+19b5e8a0-3798-425b-bb07-0d8e79708bb2,2026-06-09 07:37:37,How do I add teammates?,resolved
+54d95fe0-9679-44a2-873c-63745e2207b8,2026-06-12 09:37:37,Slow dashboard load,pending
+54d95fe0-9679-44a2-873c-63745e2207b8,2026-07-16 08:29:37,Slow dashboard load,pending
+59b99135-b28f-470c-bbe9-1d1ffbb7f23c,2026-06-06 04:41:37,Feature request,open
+59b99135-b28f-470c-bbe9-1d1ffbb7f23c,2026-06-26 11:37:37,Slow dashboard load,resolved
+d42a6dd7-f31d-4338-bbed-63f621ac4e3d,2026-05-17 16:38:37,Feature request,open
+d42a6dd7-f31d-4338-bbed-63f621ac4e3d,2026-06-30 17:55:37,How do I add teammates?,open
+48a468a1-c91c-4be8-870d-23d6c0d5b49b,2026-06-10 16:46:37,Can't find export button,open
+0cd136c8-dfba-4275-9414-c4aad7534e0b,2026-06-30 10:45:37,Slow dashboard load,open
+b3a28d24-7520-465a-9ea1-5d632e4b8ede,2026-06-22 21:55:37,Can't find export button,pending
+013e6438-c04e-4b53-ad83-7dcbf19b3d75,2026-06-15 16:20:37,Slow dashboard load,resolved
+013e6438-c04e-4b53-ad83-7dcbf19b3d75,2026-05-19 17:05:37,Login issue,open
+70935943-baae-4eab-93df-867534b04574,2026-06-08 06:58:37,Login issue,resolved
+70935943-baae-4eab-93df-867534b04574,2026-08-06 08:23:37,Billing question,pending
+9b02d5d7-5add-455b-9a7e-5ac73eaf5ab8,2026-06-02 04:55:37,Feature request,pending
+9b02d5d7-5add-455b-9a7e-5ac73eaf5ab8,2026-06-19 06:01:37,Login issue,resolved
+1d52ec1a-6b20-4e03-9044-19b0bab1ea0d,2026-06-18 23:24:37,Slow dashboard load,resolved
+1d52ec1a-6b20-4e03-9044-19b0bab1ea0d,2026-08-03 17:37:37,How do I add teammates?,open
+f35b6e94-e65b-41f3-950b-d8e576ba15ad,2026-06-28 03:03:37,Feature request,open
+f35b6e94-e65b-41f3-950b-d8e576ba15ad,2026-06-27 11:57:37,Feature request,open
+7b4d57a7-1d5b-4a80-b11f-a2abf2606aa1,2026-06-17 03:29:37,Slow dashboard load,pending
+d0751661-3bad-42af-9088-3b74f41e9d8a,2026-05-17 18:23:37,How do I add teammates?,pending
+98b64fcb-ab11-4bbb-8e4c-edfb9e02beb1,2026-07-05 02:20:37,Slow dashboard load,pending
+a9843162-488c-4b52-b441-bc516442a8a9,2026-05-24 13:22:37,Login issue,open
+5ba727ac-1203-4add-8f0c-5469f8f040b3,2026-07-27 18:40:37,Feature request,open
+8e8639af-fccc-4acc-8e61-b75d447327e9,2026-07-18 12:01:37,Feature request,open
+8e8639af-fccc-4acc-8e61-b75d447327e9,2026-07-13 01:56:37,Billing question,resolved
+fa2b1b1a-40d8-4919-a58d-9bf14181c68e,2026-05-15 10:12:37,Feature request,open
+fa2b1b1a-40d8-4919-a58d-9bf14181c68e,2026-08-01 12:18:37,Login issue,pending
+429a215a-ddc4-482a-b109-294a090046c1,2026-06-02 19:02:37,Can't find export button,resolved
+429a215a-ddc4-482a-b109-294a090046c1,2026-06-11 22:42:37,How do I add teammates?,open
+4360bf44-7eab-437f-bb0b-2f6878cdd302,2026-08-02 22:30:37,Feature request,pending
+d62a10db-1ae3-4111-88b9-327ea2b68f79,2026-08-09 02:54:37,Billing question,open
+753bc92d-b4bb-4f74-a876-adec3d8dc250,2026-06-07 02:26:37,Login issue,open
+753bc92d-b4bb-4f74-a876-adec3d8dc250,2026-06-17 08:55:37,Billing question,open
+e3a6cf3a-b389-47f8-92f9-c96ebc91f900,2026-07-05 14:32:37,Slow dashboard load,resolved
+7656b46d-839a-446c-8545-996ad94a3368,2026-07-24 20:12:37,Billing question,pending
+d167ccc1-c479-44e2-a61e-50a1e023330e,2026-06-09 01:37:37,Can't find export button,resolved
+d167ccc1-c479-44e2-a61e-50a1e023330e,2026-06-17 15:12:37,Feature request,pending
+44af8e37-79e2-4f82-be42-3552f8fb265c,2026-07-07 07:56:37,Can't find export button,open
+44af8e37-79e2-4f82-be42-3552f8fb265c,2026-05-21 05:14:37,Feature request,open
+a3c2d987-8317-4b71-85cf-ffcf695667eb,2026-06-05 13:36:37,Login issue,open
+0eee4e2b-2429-44a2-8936-bf954b4d031a,2026-07-03 02:58:37,Can't find export button,open
+0eee4e2b-2429-44a2-8936-bf954b4d031a,2026-07-14 13:41:37,Can't find export button,pending
+9efe8116-728f-489a-9552-ff7426ca6431,2026-06-02 18:27:37,Can't find export button,pending
+9efe8116-728f-489a-9552-ff7426ca6431,2026-06-11 23:24:37,How do I add teammates?,pending
+5f045765-69ad-40e7-9fd3-28afe2c6cf4e,2026-05-14 17:14:37,Can't find export button,resolved
+d4b5096b-14ba-4028-8d30-162c71f7dffb,2026-05-28 22:47:37,Feature request,open
+d4b5096b-14ba-4028-8d30-162c71f7dffb,2026-05-18 20:50:37,Slow dashboard load,open
+338fe9e8-c4f9-4401-a371-274835d3c2c0,2026-05-18 03:15:37,Can't find export button,open
+338fe9e8-c4f9-4401-a371-274835d3c2c0,2026-07-21 15:17:37,Can't find export button,resolved
+fd1f9e8a-a263-42c4-8f96-835e30e0dd73,2026-05-25 06:14:37,How do I add teammates?,resolved
+fd1f9e8a-a263-42c4-8f96-835e30e0dd73,2026-06-06 04:49:37,Login issue,resolved
+dcfb665c-841b-4134-8293-2772b5b45fb0,2026-08-01 03:42:37,Login issue,open
+de6317d1-37a4-4d8c-85f2-ae9f197bd82c,2026-05-28 19:35:37,Can't find export button,pending
+de6317d1-37a4-4d8c-85f2-ae9f197bd82c,2026-06-14 04:25:37,How do I add teammates?,resolved
+367d78e0-015a-4c33-9c86-c2c6cfc5408f,2026-07-31 11:22:37,Slow dashboard load,resolved
+367d78e0-015a-4c33-9c86-c2c6cfc5408f,2026-06-12 12:47:37,Login issue,resolved
+7f4ab3b9-c0ed-4994-9a99-9f1a3fcdc288,2026-05-27 16:11:37,Billing question,resolved
+7f4ab3b9-c0ed-4994-9a99-9f1a3fcdc288,2026-06-09 08:42:37,Billing question,resolved
+b2cb5008-ca25-47d1-badf-8f236e31d1af,2026-08-09 12:18:37,Slow dashboard load,pending
+b2cb5008-ca25-47d1-badf-8f236e31d1af,2026-06-13 21:31:37,Login issue,pending
+df5805bd-b53e-45d5-ad2e-3d4c52b2dea0,2026-05-24 03:47:37,Can't find export button,open
+df5805bd-b53e-45d5-ad2e-3d4c52b2dea0,2026-06-12 14:43:37,Slow dashboard load,open
+54f61f27-9c62-41a0-8bca-3f1cf65969e9,2026-07-14 07:41:37,Feature request,pending
+54f61f27-9c62-41a0-8bca-3f1cf65969e9,2026-06-19 14:48:37,Slow dashboard load,resolved
+8ee4b203-00ee-4018-940c-04f5b81d54df,2026-06-08 06:15:37,Login issue,resolved
+8ee4b203-00ee-4018-940c-04f5b81d54df,2026-07-18 20:38:37,How do I add teammates?,pending
+85ba2008-ade5-4d0e-8f94-e38f06479f9b,2026-06-15 13:01:37,Can't find export button,pending
+85ba2008-ade5-4d0e-8f94-e38f06479f9b,2026-06-10 22:26:37,Can't find export button,pending
+b977af3e-e479-4617-ac0b-88187eaf548a,2026-06-02 10:54:37,Slow dashboard load,open
+b977af3e-e479-4617-ac0b-88187eaf548a,2026-06-25 10:20:37,Billing question,resolved
+86172569-9107-4abb-90b7-5a22d94f91d9,2026-07-19 03:28:37,Slow dashboard load,pending
+fcf76ccc-2c92-4449-9f29-0a62528d82be,2026-07-11 19:23:37,Feature request,resolved
+fcf76ccc-2c92-4449-9f29-0a62528d82be,2026-06-22 09:23:37,Login issue,open
+204b2736-4e6c-47b2-b8e9-d90fc4f1f6d4,2026-06-16 11:19:37,Feature request,pending
+7e307aae-8046-4514-a182-50ca4ea696c5,2026-06-09 09:36:37,Feature request,resolved
+7e307aae-8046-4514-a182-50ca4ea696c5,2026-06-03 00:39:37,Billing question,open
+0214ab85-681c-4f7d-af0d-c9aa66760379,2026-07-23 07:16:37,Billing question,open
+48b52f15-ea24-45d4-9ca7-01b6f1c87d89,2026-07-07 17:29:37,Billing question,pending
+48b52f15-ea24-45d4-9ca7-01b6f1c87d89,2026-07-03 02:52:37,Login issue,pending
+821d666c-58b5-4ce7-809b-ac8b345e97d2,2026-07-28 06:07:37,Slow dashboard load,open
+821d666c-58b5-4ce7-809b-ac8b345e97d2,2026-05-20 14:44:37,Slow dashboard load,resolved
+832b2b52-6547-4a21-8ba1-5938836896c2,2026-06-01 09:52:37,Slow dashboard load,open
+500c85a7-86d8-4eba-9025-43f086315413,2026-06-05 04:23:37,Billing question,open
+500c85a7-86d8-4eba-9025-43f086315413,2026-05-12 09:58:37,Billing question,open
+a7be8913-abe2-421b-ab59-c10350b3c9ce,2026-06-19 08:31:37,Login issue,pending
+a7be8913-abe2-421b-ab59-c10350b3c9ce,2026-05-31 10:48:37,Slow dashboard load,resolved
+aa61443f-9534-41d7-b196-c491d7f48575,2026-06-24 01:19:37,Can't find export button,pending
+aa61443f-9534-41d7-b196-c491d7f48575,2026-05-12 12:40:37,Billing question,resolved
+99698678-9b95-4150-b797-beb3d168f033,2026-05-21 21:51:37,Slow dashboard load,open
+f545b3fe-9ed9-445d-bf00-e9bff7f1463b,2026-08-04 04:37:37,Feature request,open
+f545b3fe-9ed9-445d-bf00-e9bff7f1463b,2026-05-14 06:36:37,Feature request,resolved
+55060136-af1c-4f75-9d76-6cc09e776c1a,2026-06-12 05:27:37,Login issue,pending
+55060136-af1c-4f75-9d76-6cc09e776c1a,2026-07-27 18:00:37,Slow dashboard load,open
+3e3a8fa9-1348-4570-9953-8d597c117a86,2026-08-03 02:13:37,How do I add teammates?,pending
+8b872c28-feb1-469e-a4ff-98f567b286ac,2026-07-27 02:03:37,Billing question,resolved
+819b5f88-ca09-41f9-8312-10d2fc735962,2026-08-07 23:45:37,Feature request,pending
+819b5f88-ca09-41f9-8312-10d2fc735962,2026-06-26 07:26:37,Feature request,pending
+6469324d-e210-4093-a457-030afe16135a,2026-05-23 01:50:37,How do I add teammates?,resolved
+941eb382-a892-4f3d-a860-9ea95d66c3b1,2026-05-29 01:41:37,Billing question,resolved
+941eb382-a892-4f3d-a860-9ea95d66c3b1,2026-08-09 05:09:37,Slow dashboard load,resolved
+ac53d453-659d-4761-8a73-8fea7075e7c4,2026-07-31 23:49:37,Login issue,pending
+ac53d453-659d-4761-8a73-8fea7075e7c4,2026-06-10 16:02:37,Can't find export button,pending
+d5fc6b5b-4775-447a-b49b-721d107c2581,2026-05-27 11:33:37,Login issue,open
+52c4ada2-1767-4de0-b3f4-4e091202f9ea,2026-05-23 22:02:37,Can't find export button,pending
+95bf7f0d-0cf4-4b2d-a68d-dc59760ce447,2026-07-07 16:01:37,Can't find export button,pending
+fa0833c0-cb3c-4d4a-b708-bfbe9ccc51b4,2026-07-27 11:16:37,Login issue,resolved
+fa0833c0-cb3c-4d4a-b708-bfbe9ccc51b4,2026-05-18 00:17:37,Slow dashboard load,pending
+c005de62-773d-49c6-9381-82420e015505,2026-08-02 03:57:37,Login issue,open
+b00461b7-cae5-4eee-8431-270057024493,2026-07-08 11:42:37,Login issue,open
+b4c2904b-e80c-40e8-a3cf-9b03d2f00e4a,2026-07-11 07:58:37,Slow dashboard load,pending
+ef96e574-d80d-4c17-b38b-3c5f72b9e5c6,2026-06-21 23:13:37,Billing question,pending
+758d8e97-3015-4ba1-9cb0-0fc4ed032e9e,2026-05-17 21:10:37,Login issue,pending
+758d8e97-3015-4ba1-9cb0-0fc4ed032e9e,2026-06-06 16:36:37,Feature request,resolved
+8cc545e2-26ef-4d69-a652-53397e23189d,2026-05-14 01:05:37,Can't find export button,pending
+545a2b58-507b-4895-9058-ab77bbdbe67a,2026-05-30 04:07:37,Slow dashboard load,open
+545a2b58-507b-4895-9058-ab77bbdbe67a,2026-06-16 00:22:37,Billing question,resolved
+a8159099-fe07-4b66-a980-db126a5906f3,2026-08-04 07:31:37,Feature request,resolved
+b07a3760-1e8b-4df6-8121-f361497b9610,2026-05-26 19:54:37,Billing question,resolved
+80f2a438-189b-4e9a-9f00-5c4e688acc57,2026-06-16 22:16:37,Login issue,pending
+80f2a438-189b-4e9a-9f00-5c4e688acc57,2026-06-02 22:06:37,Can't find export button,open
+c88d1d7f-8316-4eae-82db-de764fca8d6f,2026-07-08 20:43:37,Can't find export button,open
+c88d1d7f-8316-4eae-82db-de764fca8d6f,2026-05-31 13:06:37,Billing question,pending
+22a53db1-bcbe-4265-a0e0-de8b2be68249,2026-07-01 16:52:37,Can't find export button,pending
+22a53db1-bcbe-4265-a0e0-de8b2be68249,2026-08-06 07:12:37,Billing question,pending
+12d9c69d-5244-44bb-8ecb-87fa26c3f743,2026-07-13 04:54:37,Feature request,pending
+3d4ea4c5-4ee2-4a9e-ab53-7dab63f8cc87,2026-05-31 04:41:37,Can't find export button,open
+1fae1d6a-a647-4168-8123-a247444553ca,2026-08-01 09:14:37,Can't find export button,open
+695477b1-bbc1-427c-adc2-0409e679ffaf,2026-05-18 05:32:37,How do I add teammates?,open
+2bcf2c79-fb74-4813-818e-693b3a8594cb,2026-07-01 16:13:37,Can't find export button,pending
+7ba156a9-0478-4c8c-8a72-25d96f329d16,2026-06-22 17:11:37,Feature request,resolved
+7ba156a9-0478-4c8c-8a72-25d96f329d16,2026-07-02 12:23:37,Feature request,pending
+25bea0d8-834c-4b6c-8fb8-f6b66d2e441a,2026-07-27 04:06:37,How do I add teammates?,pending
+25bea0d8-834c-4b6c-8fb8-f6b66d2e441a,2026-06-08 06:31:37,Slow dashboard load,resolved
+124e345e-9406-4347-8e3e-27f352a4af95,2026-06-26 12:00:37,Can't find export button,open
+124e345e-9406-4347-8e3e-27f352a4af95,2026-06-11 01:13:37,Slow dashboard load,resolved

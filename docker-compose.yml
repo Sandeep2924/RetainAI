@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: retainai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retainai}
+      POSTGRES_DB: retainai
+    volumes:
+      - retainai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retainai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://retainai:${POSTGRES_PASSWORD:-retainai}@db:5432/retainai
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set. Generate one with python -c 'import secrets; print(secrets.token_hex(32))'}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      ENV: production
+    ports:
+      - "8000:8000"
+
+  snapshot:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://retainai:${POSTGRES_PASSWORD:-retainai}@db:5432/retainai
+    command: ["python", "scripts/snapshot_risk_scores.py", "--loop"]
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  retainai_pgdata:
