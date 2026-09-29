@@ -47,9 +47,20 @@ def configure(model, explainer, model_version):
 def _load_roster_and_activity():
     """One round trip per table, not one per customer."""
     now = datetime.utcnow()
-    login_cutoff = now - timedelta(days=LOGIN_WINDOW_DAYS)
-    usage_cutoff = now - timedelta(days=USAGE_WINDOW_DAYS)
-    ticket_cutoff = now - timedelta(days=TICKET_WINDOW_DAYS)
+
+    # Determine the latest recorded activity timestamp across tables
+    with engine.connect() as conn:
+        max_ts = conn.execute(text(
+            'SELECT GREATEST(MAX(login_at), (SELECT MAX(occurred_at) FROM usage_events)) FROM login_events'
+        )).scalar()
+
+    # If the newest event is in the past by >2 days (e.g. paused simulation or static staging database),
+    # anchor the feature calculation window to the latest recorded activity so realistic variance is preserved.
+    anchor = max_ts if (max_ts and (now - max_ts) > timedelta(days=2)) else now
+
+    login_cutoff = anchor - timedelta(days=LOGIN_WINDOW_DAYS)
+    usage_cutoff = anchor - timedelta(days=USAGE_WINDOW_DAYS)
+    ticket_cutoff = anchor - timedelta(days=TICKET_WINDOW_DAYS)
 
     roster = pd.read_sql(text('SELECT customer_id, name, email, signup_date FROM ml_customers'), engine)
     logins = pd.read_sql(
@@ -213,7 +224,13 @@ def get_customer_trend(customer_id: str, days: int = 14):
         return None
 
     today = datetime.utcnow()
-    wide_cutoff = today - timedelta(days=days + max(LOGIN_WINDOW_DAYS, USAGE_WINDOW_DAYS, TICKET_WINDOW_DAYS))
+    with engine.connect() as conn:
+        max_ts = conn.execute(text(
+            'SELECT GREATEST(MAX(login_at), (SELECT MAX(occurred_at) FROM usage_events WHERE customer_id = :cid)) '
+            'FROM login_events WHERE customer_id = :cid'
+        ), {"cid": customer_id}).scalar()
+    anchor = max_ts if (max_ts and (today - max_ts) > timedelta(days=2)) else today
+    wide_cutoff = anchor - timedelta(days=days + max(LOGIN_WINDOW_DAYS, USAGE_WINDOW_DAYS, TICKET_WINDOW_DAYS))
 
     logins = pd.read_sql(
         text('SELECT customer_id, login_at FROM login_events WHERE customer_id = :cid AND login_at > :cutoff'),
