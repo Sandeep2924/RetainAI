@@ -6,17 +6,25 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
+      - key: ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
       - key: DATABASE_URL
         sync: false
-      - key: RESEND_API_KEY
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: OPENAI_API_KEY
         sync: false
       - key: SMTP_HOST
-        sync: false
+        value: smtp.resend.com
       - key: SMTP_PORT
-        sync: false
-      - key: SMTP_USERNAME
-        sync: false
+        value: "587"
+      - key: SMTP_USER
+        value: resend
       - key: SMTP_PASSWORD
         sync: false
-      - key: SMTP_FROM_EMAIL
+      - key: SMTP_FROM
+        value: onboarding@resend.dev
+      - key: ALERT_EMAIL_TO
         sync: false

@@ -118,7 +118,12 @@ def run(interval_seconds: float, new_customers: int, once: bool):
         print(f"[realtime] simulating activity for {len(customer_ids)} customers "
               f"(1 event every ~{interval_seconds}s, Ctrl+C to stop)")
         while True:
-            emit_one_event(db, customer_ids)
+            try:
+                db_loop = SessionLocal()
+                emit_one_event(db_loop, customer_ids)
+                db_loop.close()
+            except Exception as e:
+                print(f"[realtime] error emitting event: {e}")
             time.sleep(interval_seconds)
     finally:
         db.close()

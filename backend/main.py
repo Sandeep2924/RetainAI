@@ -13,7 +13,12 @@ import json
 import asyncio
 import smtplib
 import logging
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 from datetime import datetime, timedelta, timezone, date
 from typing import Optional
 
@@ -48,13 +53,21 @@ from database import (
 )
 
 load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="RetainAI")
 
+raw_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "")
+allowed_origins_list = [o.strip() for o in raw_allowed_origins.split(",") if o.strip()]
+
+# Allows localhost (any port) + any Vercel production or preview domain (*.vercel.app)
+CORS_ORIGIN_REGEX = r"^(http://(localhost|127\.0\.0\.1):\d+|https://.*\.vercel\.app)$"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
+    allow_origins=allowed_origins_list,
+    allow_origin_regex=CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -80,8 +93,19 @@ elif not SECRET_KEY:
     print("[WARNING] SECRET_KEY not set — using a dev-only fallback.")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "model.pkl")
-META_PATH = os.path.join(os.path.dirname(__file__), "..", "model_metadata.json")
+_MODEL_CANDIDATES = [
+    os.path.join(os.path.dirname(__file__), "model.pkl"),
+    os.path.join(os.path.dirname(__file__), "..", "model.pkl"),
+    os.path.join(os.path.dirname(__file__), "saas_churn_model.pkl"),
+    os.path.join(os.path.dirname(__file__), "..", "saas_churn_model.pkl"),
+]
+MODEL_PATH = next((p for p in _MODEL_CANDIDATES if os.path.exists(p)), _MODEL_CANDIDATES[0])
+
+_META_CANDIDATES = [
+    os.path.join(os.path.dirname(__file__), "model_metadata.json"),
+    os.path.join(os.path.dirname(__file__), "..", "model_metadata.json"),
+]
+META_PATH = next((p for p in _META_CANDIDATES if os.path.exists(p)), _META_CANDIDATES[0])
 
 model = None
 explainer = None
@@ -691,6 +715,7 @@ def _generate_email_draft(customer_data: dict, shap_explanations: dict, tone: st
         f"Draft a personalized retention email offering a relevant solution based strictly on "
         f"their risk drivers. Tone should be {TONE_GUIDANCE[tone]}. Length should be {LENGTH_GUIDANCE[length]}. "
         "Sign off as 'RetainAI Automated Success Team'. Do not use placeholders like [Name]. "
+        "Output plain text only. Do not use HTML tags, markdown, or rich text formatting. "
         "Respond with two lines: 'SUBJECT: ...' followed by the email body."
     )
     try:
@@ -908,7 +933,7 @@ def list_drafts(customer_id: Optional[str] = None, current_user: str = Depends(g
         db.close()
 
 
-def _get_draft_or_404(db: Session, draft_id: int) -> EmailDraft:
+def _get_draft_or_404(db: Session, draft_id: str) -> EmailDraft:
     draft = db.query(EmailDraft).filter(EmailDraft.id == draft_id).first()
     if not draft:
         raise HTTPException(404, "Draft not found")
@@ -916,7 +941,7 @@ def _get_draft_or_404(db: Session, draft_id: int) -> EmailDraft:
 
 
 @app.get("/emails/drafts/{draft_id}")
-def get_draft(draft_id: int, current_user: str = Depends(get_current_user)):
+def get_draft(draft_id: str, current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
         return _draft_to_dict(_get_draft_or_404(db, draft_id))
@@ -925,7 +950,7 @@ def get_draft(draft_id: int, current_user: str = Depends(get_current_user)):
 
 
 @app.put("/emails/drafts/{draft_id}")
-def update_draft(draft_id: int, payload: EmailDraftUpdate, current_user: str = Depends(get_current_user)):
+def update_draft(draft_id: str, payload: EmailDraftUpdate, current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
         draft = _get_draft_or_404(db, draft_id)
@@ -943,7 +968,7 @@ def update_draft(draft_id: int, payload: EmailDraftUpdate, current_user: str = D
 
 
 @app.delete("/emails/drafts/{draft_id}")
-def delete_draft(draft_id: int, current_user: str = Depends(get_current_user)):
+def delete_draft(draft_id: str, current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
         draft = _get_draft_or_404(db, draft_id)
@@ -954,19 +979,28 @@ def delete_draft(draft_id: int, current_user: str = Depends(get_current_user)):
         db.close()
 
 
-def _send_smtp_email(to_addr: str, subject: str, body: str) -> tuple[bool, str]:
+def _send_smtp_email(to_addr: str, subject: str, body: str, html_body: str = None) -> tuple[bool, str]:
     host, user = os.environ.get("SMTP_HOST"), os.environ.get("SMTP_USER")
     password = os.environ.get("SMTP_PASSWORD")
+    from_addr = os.environ.get("SMTP_FROM", user)  # Use verified sender if set
     port = int(os.environ.get("SMTP_PORT", "587"))
     if not all([host, user, password, to_addr]):
         return False, "SMTP is not configured (set SMTP_HOST / SMTP_USER / SMTP_PASSWORD)"
-    msg = MIMEText(body)
-    msg["Subject"], msg["From"], msg["To"] = subject, user, to_addr
+    from email.mime.multipart import MIMEMultipart
+    if html_body:
+        msg = MIMEMultipart("alternative")
+        msg.attach(MIMEText(body, "plain"))
+        msg.attach(MIMEText(html_body, "html"))
+    else:
+        msg = MIMEText(body, "plain")
+    msg["Subject"] = subject
+    msg["From"] = from_addr
+    msg["To"] = to_addr
     try:
-        with smtplib.SMTP(host, port, timeout=10) as server:
+        with smtplib.SMTP(host, port, timeout=15) as server:
             server.starttls()
             server.login(user, password)
-            server.sendmail(user, [to_addr], msg.as_string())
+            server.sendmail(from_addr, [to_addr], msg.as_string())
         return True, "sent"
     except Exception as e:
         logging.warning(f"SMTP send failed: {e}")
@@ -974,7 +1008,7 @@ def _send_smtp_email(to_addr: str, subject: str, body: str) -> tuple[bool, str]:
 
 
 @app.post("/emails/drafts/{draft_id}/send_test")
-def send_test_draft(draft_id: int, current_user: str = Depends(get_current_user)):
+def send_test_draft(draft_id: str, current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
         draft = _get_draft_or_404(db, draft_id)
@@ -987,7 +1021,7 @@ def send_test_draft(draft_id: int, current_user: str = Depends(get_current_user)
 
 
 @app.post("/emails/drafts/{draft_id}/send")
-def send_draft(draft_id: int, current_user: str = Depends(get_current_user)):
+def send_draft(draft_id: str, current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
         draft = _get_draft_or_404(db, draft_id)
@@ -1314,6 +1348,496 @@ def export_report_csv(report_id: int, current_user: str = Depends(get_current_us
     )
 
 
+def _build_excel_attachment(report_name: str, result: dict) -> bytes:
+    """Build a styled Excel workbook from report result and return as bytes."""
+    wb = openpyxl.Workbook()
+
+    # Styles
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    header_fill = PatternFill("solid", fgColor="0E7490")
+    subheader_fill = PatternFill("solid", fgColor="1E293B")
+    subheader_font = Font(bold=True, color="94A3B8", size=10)
+    title_font = Font(bold=True, color="06B6D4", size=14)
+    center = Alignment(horizontal="center", vertical="center")
+    thin_border = Border(
+        bottom=Side(style="thin", color="334155"),
+        right=Side(style="thin", color="334155"),
+    )
+
+    # Summary sheet
+    ws_summary = wb.active
+    ws_summary.title = "Summary"
+    ws_summary.column_dimensions["A"].width = 32
+    ws_summary.column_dimensions["B"].width = 24
+
+    ws_summary["A1"] = f"RetainAI — {report_name}"
+    ws_summary["A1"].font = title_font
+    ws_summary["A2"] = f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
+    ws_summary["A2"].font = Font(color="64748B", size=10)
+    ws_summary.row_dimensions[1].height = 28
+
+    ws_summary["A4"] = "Metric"
+    ws_summary["B4"] = "Value"
+    for cell in [ws_summary["A4"], ws_summary["B4"]]:
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
+
+    row = 5
+    for k, v in result.items():
+        if isinstance(v, (int, float, str, bool)) and not isinstance(v, dict):
+            ws_summary.cell(row=row, column=1, value=k.replace("_", " ").title()).border = thin_border
+            ws_summary.cell(row=row, column=2, value=v).border = thin_border
+            row += 1
+        elif isinstance(v, list):
+            ws_summary.cell(row=row, column=1, value=k.replace("_", " ").title()).border = thin_border
+            ws_summary.cell(row=row, column=2, value=f"{len(v)} records").border = thin_border
+            row += 1
+
+    # Data sheets — one per list key in result
+    for key, records in result.items():
+        if not isinstance(records, list) or not records:
+            continue
+        sheet_name = key.replace("_", " ").title()[:31]
+        ws = wb.create_sheet(title=sheet_name)
+        if not records:
+            continue
+        cols = list(records[0].keys()) if isinstance(records[0], dict) else ["value"]
+        for ci, col in enumerate(cols, 1):
+            ws.column_dimensions[get_column_letter(ci)].width = max(16, len(str(col)) + 4)
+            cell = ws.cell(row=1, column=ci, value=col.replace("_", " ").title())
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center
+            cell.border = thin_border
+        for ri, record in enumerate(records, 2):
+            if isinstance(record, dict):
+                for ci, col in enumerate(cols, 1):
+                    c = ws.cell(row=ri, column=ci, value=record.get(col, ""))
+                    c.border = thin_border
+                    if ri % 2 == 0:
+                        c.fill = PatternFill("solid", fgColor="0F172A")
+            else:
+                ws.cell(row=ri, column=1, value=record).border = thin_border
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return buf.read()
+
+
+def _send_smtp_email_with_attachment(
+    to_addr: str, subject: str, plain_body: str, html_body: str,
+    attachment_bytes: bytes, attachment_filename: str
+) -> tuple[bool, str]:
+    host, user = os.environ.get("SMTP_HOST"), os.environ.get("SMTP_USER")
+    password = os.environ.get("SMTP_PASSWORD")
+    from_addr = os.environ.get("SMTP_FROM", user)
+    port = int(os.environ.get("SMTP_PORT", "587"))
+    if not all([host, user, password, to_addr]):
+        return False, "SMTP not configured"
+
+    from email.mime.multipart import MIMEMultipart
+
+    outer = MIMEMultipart("mixed")
+    outer["Subject"] = subject
+    outer["From"] = from_addr
+    outer["To"] = to_addr
+
+    # Attach text + html as alternatives
+    alt = MIMEMultipart("alternative")
+    alt.attach(MIMEText(plain_body, "plain"))
+    alt.attach(MIMEText(html_body, "html"))
+    outer.attach(alt)
+
+    # Attach Excel file
+    part = MIMEBase("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    part.set_payload(attachment_bytes)
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", "attachment", filename=attachment_filename)
+    outer.attach(part)
+
+    try:
+        with smtplib.SMTP(host, port, timeout=20) as server:
+            server.starttls()
+            server.login(user, password)
+            server.sendmail(from_addr, [to_addr], outer.as_string())
+        return True, "sent"
+    except Exception as e:
+        logging.warning(f"SMTP send failed: {e}")
+        return False, f"send failed: {e}"
+
+
+class EmailReportRequest(BaseModel):
+    to_email: str
+
+
+@app.post("/reports/{report_id}/email")
+def email_report(report_id: int, req: EmailReportRequest, current_user: str = Depends(get_current_user)):
+    db = db_session()
+    try:
+        report = _get_report_or_404(db, report_id)
+        result = json.loads(report.result_json) if report.result_json else {}
+
+        generated_at = report.created_at.strftime("%B %d, %Y at %H:%M UTC") if report.created_at else "N/A"
+        generated_at_short = report.created_at.strftime("%Y-%m-%d %H:%M UTC") if report.created_at else "N/A"
+
+        # ── Plain text body ──────────────────────────────────────────────────
+        summary_lines = []
+        for k, v in result.items():
+            if isinstance(v, (int, float, str, bool)) and not isinstance(v, dict):
+                summary_lines.append(f"  • {k.replace('_', ' ').title()}: {v}")
+            elif isinstance(v, list):
+                summary_lines.append(f"  • {k.replace('_', ' ').title()}: {len(v)} records")
+
+        summary_text = "\n".join(summary_lines) or "  (Full details in the attached Excel file)"
+        plain_body = (
+            f"Hello,\n\n"
+            f"Your RetainAI report \"{report.name}\" is ready.\n\n"
+            f"Report Summary:\n{summary_text}\n\n"
+            f"Generated: {generated_at_short}\n"
+            f"Status: {report.status.upper()}\n\n"
+            f"The full data is attached as an Excel (.xlsx) file.\n\n"
+            f"— RetainAI Automated System"
+        )
+
+        # ── HTML body (fully responsive, email-client-safe) ──────────────────
+        metric_rows_html = ""
+        for k, v in result.items():
+            if isinstance(v, dict):
+                continue
+            display_val = f"{len(v)} records" if isinstance(v, list) else str(v)
+            label = k.replace("_", " ").title()
+            metric_rows_html += f"""
+            <tr>
+              <td style="padding:10px 16px;color:#94a3b8;font-size:13px;border-bottom:1px solid #1e293b;white-space:nowrap">{label}</td>
+              <td style="padding:10px 16px;color:#f1f5f9;font-size:13px;font-weight:600;border-bottom:1px solid #1e293b">{display_val}</td>
+            </tr>"""
+
+        if not metric_rows_html:
+            metric_rows_html = '<tr><td colspan="2" style="padding:16px;color:#64748b;text-align:center;font-size:13px">See attached Excel file for full data.</td></tr>'
+
+        html_body = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <title>RetainAI Report</title>
+  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#0f172a;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0f172a">
+    <tr>
+      <td align="center" style="padding:32px 16px">
+        <!--[if mso]><table role="presentation" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td><![endif]-->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;background-color:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0e7490 0%,#065f46 100%);padding:36px 32px;text-align:center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="text-align:center;padding-bottom:8px">
+                    <span style="font-size:32px">&#128202;</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.3">RetainAI Report Ready</h1>
+                    <p style="margin:8px 0 0;color:#a5f3fc;font-size:14px;line-height:1.4">{report.name}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- META INFO -->
+          <tr>
+            <td style="padding:24px 32px 8px">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0f172a;border-radius:10px;border:1px solid #334155">
+                <tr>
+                  <td style="padding:12px 16px;border-bottom:1px solid #1e293b">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#128100; Generated by</td>
+                        <td style="color:#e2e8f0;font-size:13px;font-weight:600">{current_user}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;border-bottom:1px solid #1e293b">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#128197; Generated on</td>
+                        <td style="color:#e2e8f0;font-size:13px;font-weight:600">{generated_at}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#9989; Status</td>
+                        <td style="color:#10b981;font-size:13px;font-weight:700">{report.status.upper()}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- SUMMARY TABLE -->
+          <tr>
+            <td style="padding:16px 32px 8px">
+              <p style="margin:0 0 12px;color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Report Summary</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0f172a;border-radius:10px;overflow:hidden;border:1px solid #334155">
+                <tr style="background-color:#1e293b">
+                  <th style="padding:10px 16px;text-align:left;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Metric</th>
+                  <th style="padding:10px 16px;text-align:left;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Value</th>
+                </tr>
+                {metric_rows_html}
+              </table>
+            </td>
+          </tr>
+
+          <!-- ATTACHMENT NOTICE -->
+          <tr>
+            <td style="padding:16px 32px 8px">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0c2a1a;border:1px solid #065f46;border-radius:10px">
+                <tr>
+                  <td style="padding:14px 18px">
+                    <p style="margin:0;color:#6ee7b7;font-size:13px">
+                      &#128190;&nbsp;<strong>Excel file attached</strong> — Open the <em>.xlsx</em> attachment for the full dataset with multiple sheets.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA BUTTON -->
+          <tr>
+            <td style="padding:24px 32px;text-align:center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto">
+                <tr>
+                  <td style="background-color:#0e7490;border-radius:10px;text-align:center">
+                    <a href="http://localhost:5173" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;line-height:1">
+                      View Full Report &#8594;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:20px 32px;border-top:1px solid #334155;text-align:center;background-color:#0f172a">
+              <p style="margin:0;color:#475569;font-size:11px;line-height:1.6">
+                RetainAI &bull; Automated Customer Retention Intelligence<br/>
+                You&rsquo;re receiving this because a report was generated on your account.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+        # Build Excel attachment
+        xlsx_bytes = _build_excel_attachment(report.name, result)
+        safe_name = report.report_type.replace(" ", "_")
+        ts = datetime.utcnow().strftime("%Y%m%d")
+        attachment_filename = f"RetainAI_{safe_name}_{ts}.xlsx"
+
+        ok, detail = _send_smtp_email_with_attachment(
+            req.to_email, f"📊 RetainAI Report: {report.name}",
+            plain_body, html_body, xlsx_bytes, attachment_filename
+        )
+        if not ok:
+            raise HTTPException(500, f"Failed to send email: {detail}")
+        return {"sent": ok, "detail": detail, "report_name": report.name, "attachment": attachment_filename}
+    finally:
+        db.close()
+
+
+class ScheduledReportRequest(BaseModel):
+    to_email: str
+    frequency: str  # "daily" | "weekly" | "monthly"
+    report_types: list[str]
+
+
+@app.post("/reports/scheduled/send")
+def send_scheduled_report(req: ScheduledReportRequest, current_user: str = Depends(get_current_user)):
+    """Generate and immediately email a scheduled report bundle (daily/weekly/monthly)."""
+    valid_types = set(REPORT_TYPES.keys())
+    bad = [r for r in req.report_types if r not in valid_types]
+    if bad:
+        raise HTTPException(400, f"Unknown report types: {bad}. Valid: {list(valid_types)}")
+
+    freq_labels = {"daily": "Daily", "weekly": "Weekly", "monthly": "Monthly"}
+    freq_label = freq_labels.get(req.frequency, req.frequency.title())
+
+    db = db_session()
+    try:
+        generated_reports = []
+        for rt in req.report_types:
+            try:
+                result = _generate_report_data(rt, None, None, db)
+                report = Report(
+                    report_type=rt, name=f"{freq_label} {REPORT_TYPES[rt]}",
+                    status="completed", created_by=current_user, result_json=json.dumps(result),
+                )
+                db.add(report)
+                db.commit()
+                db.refresh(report)
+                generated_reports.append((report, result))
+            except Exception as e:
+                logging.warning(f"Scheduled report {rt} failed: {e}")
+
+        if not generated_reports:
+            raise HTTPException(502, "All scheduled reports failed to generate.")
+
+        # Bundle all into one multi-sheet Excel
+        wb = openpyxl.Workbook()
+        first = True
+        header_font = Font(bold=True, color="FFFFFF", size=11)
+        header_fill = PatternFill("solid", fgColor="0E7490")
+        thin_border = Border(bottom=Side(style="thin", color="334155"), right=Side(style="thin", color="334155"))
+
+        for report, result in generated_reports:
+            # Summary sheet
+            ws_name = report.report_type[:31]
+            ws = wb.active if first else wb.create_sheet(title=ws_name)
+            if first:
+                ws.title = ws_name
+                first = False
+
+            ws["A1"] = f"RetainAI — {report.name}"
+            ws["A1"].font = Font(bold=True, color="06B6D4", size=13)
+            ws["A2"] = f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
+            ws["A2"].font = Font(color="64748B", size=10)
+
+            ws["A4"] = "Metric"
+            ws["B4"] = "Value"
+            ws["A4"].font = ws["B4"].font = header_font
+            ws["A4"].fill = ws["B4"].fill = header_fill
+            ws.column_dimensions["A"].width = 30
+            ws.column_dimensions["B"].width = 22
+
+            row = 5
+            for k, v in result.items():
+                if isinstance(v, (int, float, str, bool)) and not isinstance(v, dict):
+                    ws.cell(row, 1, k.replace("_", " ").title()).border = thin_border
+                    ws.cell(row, 2, v).border = thin_border
+                    row += 1
+                elif isinstance(v, list):
+                    ws.cell(row, 1, k.replace("_", " ").title()).border = thin_border
+                    ws.cell(row, 2, f"{len(v)} records").border = thin_border
+                    row += 1
+
+            # Data tabs
+            for key, records in result.items():
+                if not isinstance(records, list) or not records:
+                    continue
+                tab_name = f"{ws_name[:20]}_{key[:10]}"[:31]
+                ws2 = wb.create_sheet(title=tab_name)
+                cols = list(records[0].keys()) if isinstance(records[0], dict) else ["value"]
+                for ci, col in enumerate(cols, 1):
+                    ws2.column_dimensions[get_column_letter(ci)].width = max(16, len(str(col)) + 4)
+                    c = ws2.cell(1, ci, col.replace("_", " ").title())
+                    c.font = header_font
+                    c.fill = header_fill
+                    c.border = thin_border
+                for ri, rec in enumerate(records, 2):
+                    if isinstance(rec, dict):
+                        for ci, col in enumerate(cols, 1):
+                            ws2.cell(ri, ci, rec.get(col, "")).border = thin_border
+                    else:
+                        ws2.cell(ri, 1, rec).border = thin_border
+
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        xlsx_bytes = buf.read()
+
+        ts = datetime.utcnow().strftime("%Y%m%d")
+        attachment_filename = f"RetainAI_{freq_label}_Bundle_{ts}.xlsx"
+        subject = f"📊 RetainAI {freq_label} Report Bundle — {datetime.utcnow().strftime('%b %d, %Y')}"
+
+        report_names_html = "".join(f"<li style='margin:4px 0;color:#94a3b8;font-size:13px'>{r.name}</li>" for r, _ in generated_reports)
+
+        html_body = f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>RetainAI {freq_label} Reports</title></head>
+<body style="margin:0;padding:0;background-color:#0f172a;font-family:Arial,Helvetica,sans-serif">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0f172a">
+    <tr><td align="center" style="padding:32px 16px">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;background-color:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155">
+        <tr>
+          <td style="background:linear-gradient(135deg,#0e7490 0%,#065f46 100%);padding:36px 32px;text-align:center">
+            <span style="font-size:36px">&#128202;</span>
+            <h1 style="margin:12px 0 0;color:#fff;font-size:22px;font-weight:800">{freq_label} Report Bundle</h1>
+            <p style="margin:8px 0 0;color:#a5f3fc;font-size:14px">{datetime.utcnow().strftime('%B %d, %Y')}</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 32px">
+            <p style="margin:0 0 16px;color:#94a3b8;font-size:13px">Your <strong style="color:#e2e8f0">{freq_label.lower()}</strong> RetainAI report bundle is attached. It contains <strong style="color:#e2e8f0">{len(generated_reports)}</strong> report(s):</p>
+            <ul style="margin:0 0 20px;padding-left:20px">{report_names_html}</ul>
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0c2a1a;border:1px solid #065f46;border-radius:10px;margin-bottom:24px">
+              <tr><td style="padding:14px 18px">
+                <p style="margin:0;color:#6ee7b7;font-size:13px">&#128190;&nbsp;<strong>Excel bundle attached</strong> — Each report has its own summary tab plus detailed data sheets.</p>
+              </td></tr>
+            </table>
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto">
+              <tr><td style="background-color:#0e7490;border-radius:10px;text-align:center">
+                <a href="http://localhost:5173" style="display:inline-block;padding:14px 36px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px">View Dashboard &#8594;</a>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px;border-top:1px solid #334155;text-align:center;background-color:#0f172a">
+            <p style="margin:0;color:#475569;font-size:11px">RetainAI &bull; Automated Customer Retention Intelligence</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+        plain_body = (
+            f"RetainAI {freq_label} Report Bundle\n"
+            f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
+            f"Reports included:\n" + "\n".join(f"  - {r.name}" for r, _ in generated_reports) +
+            f"\n\nThe full data is in the attached Excel file.\n— RetainAI System"
+        )
+
+        ok, detail = _send_smtp_email_with_attachment(
+            req.to_email, subject, plain_body, html_body, xlsx_bytes, attachment_filename
+        )
+        if not ok:
+            raise HTTPException(500, f"Failed to send scheduled report: {detail}")
+        return {
+            "sent": ok, "detail": detail,
+            "frequency": req.frequency,
+            "reports_generated": len(generated_reports),
+            "attachment": attachment_filename,
+        }
+    finally:
+        db.close()
+
+
 CSV_UPLOAD_REQUIRED_COLS = ["customer_id", "Account_Age_Days", "Login_Frequency", "Daily_Usage_Mins", "Last_Support_Ticket"]
 CSV_UPLOAD_MAX_BYTES = 5 * 1024 * 1024  # 5MB
 CSV_UPLOAD_MAX_ROWS = 5000
@@ -1543,4 +2067,5 @@ def trigger_rescore(current_user: str = Depends(get_current_admin)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

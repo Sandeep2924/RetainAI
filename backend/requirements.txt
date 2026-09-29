@@ -21,3 +21,4 @@ requests==2.33.1
 
 apscheduler>=3.10
 Faker==33.1.0
+openpyxl>=3.1.5

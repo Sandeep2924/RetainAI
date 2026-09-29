@@ -18,6 +18,7 @@ Tables:
   customer_predictions — latest churn score per customer (written by pipeline.py)
 """
 import os
+import uuid
 from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import (
@@ -27,6 +28,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 
 load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
@@ -35,7 +37,17 @@ if not DATABASE_URL:
         "in backend/.env (see .env.example)."
     )
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# Fix SQLAlchemy dialect prefix if provided as postgres:// by cloud providers
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_size=10,
+    max_overflow=20,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -145,7 +157,7 @@ class EmailDraft(Base):
     not a log entry."""
     __tablename__ = "email_drafts"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     customer_id = Column(String, ForeignKey("ml_customers.customer_id"), index=True, nullable=False)
     subject = Column(String, nullable=False, default="")
     body = Column(Text, nullable=False, default="")

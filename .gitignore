@@ -28,7 +28,11 @@ backend/Database/
 *.db
 backend/.env
 frontend/.env
+frontend/dist/
+*.local
+run_realtime_loop.py
 ~$*.docx
 
 # Vercel / Render
 .vercel
+

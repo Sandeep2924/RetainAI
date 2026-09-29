@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_URL = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
 
 const client = axios.create({ baseURL: API_URL });
 
@@ -204,6 +204,20 @@ export async function downloadReportCsv(id, reportType) {
   link.click();
   link.remove();
   window.URL.revokeObjectURL(url);
+}
+
+export async function emailReport(id, email) {
+  const { data } = await client.post(`/reports/${id}/email`, { to_email: email });
+  return data;
+}
+
+export async function sendScheduledReport(toEmail, frequency, reportTypes) {
+  const { data } = await client.post("/reports/scheduled/send", {
+    to_email: toEmail,
+    frequency,
+    report_types: reportTypes,
+  });
+  return data;
 }
 
 export async function generateEmailDraft(customerId, tone, length) {
