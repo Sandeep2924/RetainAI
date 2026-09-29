@@ -108,15 +108,21 @@ def _score_frame(df: pd.DataFrame):
 
     probabilities = _model.predict_proba(X)[:, 1].tolist()
 
+    shap_calculated = False
     if _explainer is not None:
-        raw_shap = _explainer.shap_values(X)
-        churn_shap = raw_shap[1] if isinstance(raw_shap, list) else (
-            raw_shap[:, :, 1] if raw_shap.ndim == 3 else raw_shap
-        )
-        shap_df = pd.DataFrame(churn_shap, columns=FEATURE_COLS)
-        top_drivers = [FEATURE_COLS[i] for i in shap_df.abs().values.argmax(axis=1)]
-        shap_dicts = [dict(zip(FEATURE_COLS, [float(v) for v in row])) for row in churn_shap]
-    else:
+        try:
+            raw_shap = _explainer.shap_values(X)
+            churn_shap = raw_shap[1] if isinstance(raw_shap, list) else (
+                raw_shap[:, :, 1] if raw_shap.ndim == 3 else raw_shap
+            )
+            shap_df = pd.DataFrame(churn_shap, columns=FEATURE_COLS)
+            top_drivers = [FEATURE_COLS[i] for i in shap_df.abs().values.argmax(axis=1)]
+            shap_dicts = [dict(zip(FEATURE_COLS, [float(v) for v in row])) for row in churn_shap]
+            shap_calculated = True
+        except Exception as e:
+            logger.warning(f"SHAP explanation calculation failed, falling back to feature_importances_: {e}")
+
+    if not shap_calculated:
         fi = getattr(_model, "feature_importances_", None)
         top_driver = FEATURE_COLS[fi.argmax()] if fi is not None else FEATURE_COLS[0]
         top_drivers = [top_driver] * len(X)

@@ -207,8 +207,15 @@ def startup():
 
 
 @app.get("/")
+@app.head("/")
 def root():
     return {"message": "RetainAI backend is running", "docs": "/docs"}
+
+
+@app.get("/health")
+@app.head("/health")
+def health():
+    return {"status": "ok"}
 
 
 # ── Auth endpoints ───────────────────────────────────────────────────────
