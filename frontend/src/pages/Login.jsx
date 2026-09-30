@@ -116,12 +116,54 @@ export default function Login({ onAuthed }) {
         <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 20, textAlign: "center" }}>
           {mode === "login" ? "New here?" : "Already have an account?"}{" "}
           <button
+            type="button"
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0 }}
+            style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
           >
             {mode === "login" ? "Create an account" : "Sign in"}
           </button>
         </p>
+
+        <div
+          style={{
+            marginTop: 18,
+            padding: "10px 12px",
+            background: "rgba(14, 116, 144, 0.12)",
+            border: "1px solid rgba(14, 116, 144, 0.35)",
+            borderRadius: "var(--radius-sm)",
+            fontSize: 12,
+            color: "var(--text-secondary)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#a5f3fc", fontWeight: 600 }}>Demo Account</span>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("test@retain.in");
+                setPassword("password123");
+                setError("");
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#38bdf8",
+                fontSize: 12,
+                cursor: "pointer",
+                padding: 0,
+                textDecoration: "underline",
+              }}
+            >
+              Fill Credentials
+            </button>
+          </div>
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            Email: <code style={{ color: "#e2e8f0" }}>test@retain.in</code> &bull; Password: <code style={{ color: "#e2e8f0" }}>password123</code>
+          </span>
+        </div>
       </div>
     </div>
   );
