@@ -1,31 +1,84 @@
 import { useState } from "react";
-import { login, signup, setToken } from "../api";
+import { login, signup, verifyEmail, resendVerification, setToken } from "../api";
 
 export default function Login({ onAuthed }) {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // "login" | "signup" | "verify"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [error, setError] = useState("");
+  const [infoNotice, setInfoNotice] = useState("");
+  const [debugCode, setDebugCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setInfoNotice("");
     setBusy(true);
     try {
       if (mode === "signup") {
-        await signup(email, password);
+        const signupData = await signup(email, password);
+        if (signupData.requires_verification) {
+          setMode("verify");
+          setInfoNotice(signupData.message || `Verification code sent to ${email}`);
+          if (signupData.debug_code) {
+            setDebugCode(signupData.debug_code);
+          }
+          return;
+        }
       }
       const data = await login(email, password);
       setToken(data.access_token);
       onAuthed({ email, role: data.role });
     } catch (err) {
+      const detail = err.response?.data?.detail;
       setError(
-        err.response?.data?.detail ||
-          "Couldn't sign in. Check your details and try again."
+        detail || "Couldn't process your request. Check your details and try again."
       );
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleVerify(e) {
+    e.preventDefault();
+    if (!verificationCode.trim()) {
+      setError("Please enter the 6-digit verification code.");
+      return;
+    }
+    setError("");
+    setInfoNotice("");
+    setBusy(true);
+    try {
+      const data = await verifyEmail(email, verificationCode.trim());
+      setToken(data.access_token);
+      onAuthed({ email, role: data.role });
+    } catch (err) {
+      setError(err.response?.data?.detail || "Invalid or expired verification code.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResendCode() {
+    if (!email) {
+      setError("Email address is required to resend verification code.");
+      return;
+    }
+    setError("");
+    setResending(true);
+    try {
+      const res = await resendVerification(email);
+      setInfoNotice(res.message || `A new verification code was sent to ${email}`);
+      if (res.debug_code) {
+        setDebugCode(res.debug_code);
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || "Couldn't resend code. Please try again.");
+    } finally {
+      setResending(false);
     }
   }
 
@@ -66,67 +119,161 @@ export default function Login({ onAuthed }) {
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: 380,
+          maxWidth: 400,
           background: "var(--bg-1)",
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",
-          padding: "28px 22px",
+          padding: "30px 24px",
           boxSizing: "border-box",
         }}
       >
-        <h1 style={{ fontSize: 22, marginBottom: 4 }}>RetainAI</h1>
-        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 28 }}>
-          Churn intelligence for your customer base
-        </p>
-
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div>
-            <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
-              style={inputStyle}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 8 characters"
-              style={inputStyle}
-            />
-          </div>
-
-          {error && (
-            <p style={{ fontSize: 13, color: "var(--risk-high)" }}>{error}</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+          <h1 style={{ fontSize: 22, margin: 0 }}>RetainAI</h1>
+          {mode === "verify" && (
+            <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(6, 182, 212, 0.15)", color: "var(--accent)", borderRadius: 12, border: "1px solid rgba(6, 182, 212, 0.3)" }}>
+              Email Verification
+            </span>
           )}
-
-          <button type="submit" disabled={busy} style={submitStyle}>
-            {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
-          </button>
-        </form>
-
-        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 20, textAlign: "center" }}>
-          {mode === "login" ? "New here?" : "Already have an account?"}{" "}
-          <button
-            type="button"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
-          >
-            {mode === "login" ? "Create an account" : "Sign in"}
-          </button>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 24 }}>
+          {mode === "verify"
+            ? `Enter the 6-digit code sent to ${email}`
+            : "Churn intelligence for your customer base"}
         </p>
+
+        {mode === "verify" ? (
+          <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+                Verification Code
+              </label>
+              <input
+                type="text"
+                required
+                maxLength={6}
+                autoFocus
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="123456"
+                style={{
+                  ...inputStyle,
+                  textAlign: "center",
+                  fontSize: 22,
+                  letterSpacing: 6,
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                }}
+              />
+            </div>
+
+            {infoNotice && (
+              <div style={{ padding: "8px 12px", background: "rgba(6, 182, 212, 0.12)", border: "1px solid rgba(6, 182, 212, 0.35)", borderRadius: "var(--radius-sm)", fontSize: 12, color: "#a5f3fc" }}>
+                {infoNotice}
+              </div>
+            )}
+
+            {debugCode && (
+              <div style={{ padding: "8px 12px", background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: "var(--radius-sm)", fontSize: 12, color: "#fcd34d", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>Code: <strong>{debugCode}</strong></span>
+                <button
+                  type="button"
+                  onClick={() => setVerificationCode(debugCode)}
+                  style={{ background: "none", border: "none", color: "#38bdf8", cursor: "pointer", fontSize: 11, textDecoration: "underline" }}
+                >
+                  Fill Code
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <p style={{ fontSize: 13, color: "var(--risk-high)", margin: 0 }}>{error}</p>
+            )}
+
+            <button type="submit" disabled={busy} style={submitStyle}>
+              {busy ? "Verifying…" : "Verify & Activate Account"}
+            </button>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, fontSize: 12 }}>
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={resending}
+                style={{ background: "none", border: "none", color: "var(--accent)", padding: 0, cursor: "pointer", textDecoration: "underline" }}
+              >
+                {resending ? "Sending new code…" : "Resend code"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode("login"); setError(""); setInfoNotice(""); }}
+                style={{ background: "none", border: "none", color: "var(--text-muted)", padding: 0, cursor: "pointer" }}
+              >
+                Back to Sign in
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                style={inputStyle}
+              />
+            </div>
+
+            {error && (
+              <div>
+                <p style={{ fontSize: 13, color: "var(--risk-high)", margin: "0 0 6px 0" }}>{error}</p>
+                {error.toLowerCase().includes("not verified") && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode("verify"); setError(""); }}
+                    style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 12, cursor: "pointer", textDecoration: "underline", padding: 0 }}
+                  >
+                    Enter verification code now &rarr;
+                  </button>
+                )}
+              </div>
+            )}
+
+            <button type="submit" disabled={busy} style={submitStyle}>
+              {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+            </button>
+          </form>
+        )}
+
+        {mode !== "verify" && (
+          <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 20, textAlign: "center" }}>
+            {mode === "login" ? "New here?" : "Already have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
+              style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
+            >
+              {mode === "login" ? "Create an account" : "Sign in"}
+            </button>
+          </p>
+        )}
 
         <div
           style={{

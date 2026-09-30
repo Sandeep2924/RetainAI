@@ -64,3 +64,57 @@ def test_admin_role_from_env(client, admin_headers):
 def test_member_role(client, member_headers):
     r = client.get("/me", headers=member_headers)
     assert r.json()["role"] == "member"
+
+
+def test_email_verification_flow_and_db_update(client):
+    from database import SessionLocal, User
+    from main import hash_password
+    from datetime import datetime, timezone, timedelta
+
+    # Set up an unverified user in DB
+    test_email = "verifyflow@test.com"
+    test_code = "842910"
+    db = SessionLocal()
+    try:
+        user = User(
+            email=test_email,
+            hashed_password=hash_password("password123"),
+            role="member",
+            is_verified=False,
+            verification_code=test_code,
+            verification_code_expires_at=datetime.now(timezone.utc) + timedelta(minutes=15),
+        )
+        db.add(user)
+        db.commit()
+    finally:
+        db.close()
+
+    # 1. Login should fail with 403 before email is verified
+    r_login = client.post("/login", data={"username": test_email, "password": "password123"})
+    assert r_login.status_code == 403
+    assert "not verified" in r_login.json()["detail"].lower()
+
+    # 2. Verification with invalid code should fail with 400
+    r_bad_verify = client.post("/verify-email", json={"email": test_email, "code": "000000"})
+    assert r_bad_verify.status_code == 400
+    assert "invalid" in r_bad_verify.json()["detail"].lower()
+
+    # 3. Verification with correct code should succeed and return access token
+    r_verify = client.post("/verify-email", json={"email": test_email, "code": test_code})
+    assert r_verify.status_code == 200
+    assert "access_token" in r_verify.json()
+
+    # 4. Check DB: user.is_verified must be True and verification_code must be cleared
+    db = SessionLocal()
+    try:
+        u_db = db.query(User).filter(User.email == test_email).first()
+        assert u_db.is_verified is True
+        assert u_db.verification_code is None
+        assert u_db.verification_code_expires_at is None
+    finally:
+        db.close()
+
+    # 5. Login should now succeed with 200
+    r_login_ok = client.post("/login", data={"username": test_email, "password": "password123"})
+    assert r_login_ok.status_code == 200
+    assert "access_token" in r_login_ok.json()

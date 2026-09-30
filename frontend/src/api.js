@@ -39,6 +39,16 @@ export async function signup(email, password) {
   return data;
 }
 
+export async function verifyEmail(email, code) {
+  const { data } = await client.post("/verify-email", { email, code });
+  return data;
+}
+
+export async function resendVerification(email) {
+  const { data } = await client.post("/resend-verification", { email });
+  return data;
+}
+
 export async function fetchMe() {
   const { data } = await client.get("/me");
   return data;

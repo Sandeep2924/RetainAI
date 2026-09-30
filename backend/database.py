@@ -22,7 +22,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import (
-    create_engine, Column, String, Float, Integer, DateTime, Text, Date, ForeignKey, text
+    create_engine, Column, String, Float, Integer, DateTime, Text, Date, ForeignKey, text, Boolean
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
@@ -68,6 +68,9 @@ class User(Base):
     avatar_url = Column(String, default="")
     preferences = Column(Text, default="{}")
     role = Column(String, nullable=False, default="member")  # "member" | "admin"
+    is_verified = Column(Boolean, nullable=False, default=False)
+    verification_code = Column(String, nullable=True)
+    verification_code_expires_at = Column(DateTime, nullable=True)
 
 
 class MLCustomer(Base):
@@ -271,10 +274,25 @@ def get_db():
 def init_all_tables():
     """Create every table if it doesn't exist yet. Safe to call on every startup."""
     Base.metadata.create_all(bind=engine)
-    # `role` was added after `users` originally shipped — create_all() only creates
-    # missing *tables*, not missing *columns* on an existing one, so patch it in
-    # directly for anyone upgrading an already-seeded database.
-    with engine.begin() as conn:
-        conn.execute(text(
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR NOT NULL DEFAULT 'member'"
-        ))
+    # Schema migrations for existing databases
+    try:
+        with engine.begin() as conn:
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR NOT NULL DEFAULT 'member'"
+            ))
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT FALSE"
+            ))
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code VARCHAR"
+            ))
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMP"
+            ))
+            # Pre-verify all existing accounts created before verification was required
+            conn.execute(text(
+                "UPDATE users SET is_verified = TRUE WHERE is_verified IS FALSE AND verification_code IS NULL"
+            ))
+    except Exception as e:
+        import logging
+        logging.warning(f"Schema migration note: {e}")

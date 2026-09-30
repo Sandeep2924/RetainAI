@@ -6,7 +6,7 @@ per day, so /customers/{id}/risk_trend can read real recorded history
 instead of reconstructing it from mock event data every request.
 """
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, Date, UniqueConstraint, Boolean
 from sqlalchemy.sql import func
 
 from database import Base
@@ -19,6 +19,9 @@ class User(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=False)
     role = Column(String, nullable=False, default="member")  # "admin" or "member"
+    is_verified = Column(Boolean, nullable=False, default=False)
+    verification_code = Column(String, nullable=True)
+    verification_code_expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
