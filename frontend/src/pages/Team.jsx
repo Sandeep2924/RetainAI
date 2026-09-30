@@ -43,7 +43,7 @@ export default function Team({ onBack, currentUserEmail }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div>
           <h2 style={{ fontSize: 22, marginBottom: 4 }}>Team</h2>
           <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>
@@ -70,7 +70,8 @@ export default function Team({ onBack, currentUserEmail }) {
           background: "var(--bg-1)",
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-md)",
-          padding: 20,
+          padding: "16px 14px",
+          overflow: "hidden",
         }}
       >
         {error && (
@@ -82,7 +83,8 @@ export default function Team({ onBack, currentUserEmail }) {
         ) : users.length === 0 ? (
           <p style={{ color: "var(--text-secondary)" }}>No teammates yet.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table style={{ width: "100%", minWidth: 460, borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr style={{ textAlign: "left", color: "var(--text-muted)", fontSize: 12 }}>
                 <th style={{ padding: "8px 10px", fontWeight: 500 }}>Name</th>
@@ -143,6 +145,7 @@ export default function Team({ onBack, currentUserEmail }) {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

@@ -11,6 +11,7 @@ import EmailDrafts from "./pages/EmailDrafts";
 import Reports from "./pages/Reports";
 import Predictions from "./pages/Predictions";
 import Settings from "./pages/Settings";
+import { Menu } from "lucide-react";
 
 export default function App() {
   const [authState, setAuthState] = useState("checking"); // "checking" | "authed" | "unauthed"
@@ -18,6 +19,7 @@ export default function App() {
   const [view, setView] = useState("dashboard");
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [emailComposeCustomerId, setEmailComposeCustomerId] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!getToken()) {
@@ -72,22 +74,47 @@ export default function App() {
   const isAdmin = user?.role === "admin";
 
   return (
-    <div style={{ display: "flex", height: "100%" }}>
+    <div className="flex h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
       <Sidebar
         view={view}
         setView={(v) => {
           setView(v);
           setSelectedCustomerId(null);
           setEmailComposeCustomerId(null);
+          setIsMobileMenuOpen(false);
         }}
         email={user?.email}
         role={user?.role}
         onLogout={handleLogout}
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
       />
-      <main
-        className="scrollbar-thin"
-        style={{ flex: 1, padding: "28px 32px", overflowY: "auto" }}
-      >
+
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Mobile Top Navigation Bar */}
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-30 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-1.5 -ml-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-cyan-500/20 animate-pulse" />
+              <span className="font-bold text-sm tracking-tight text-white">RetainAI</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-cyan-300 font-medium capitalize px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30">
+              {view}
+            </span>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto scrollbar-thin p-3.5 sm:p-6 lg:p-8 min-w-0 w-full">
         {selectedCustomerId ? (
           <CustomerDetail
             customerId={selectedCustomerId}
@@ -123,7 +150,8 @@ export default function App() {
             onBack={() => setView("dashboard")}
           />
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

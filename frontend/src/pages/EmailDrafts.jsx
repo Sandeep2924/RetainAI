@@ -179,19 +179,19 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
 
   return (
     <div className="text-slate-200 font-sans selection:bg-cyan-900 pb-10 max-w-7xl mx-auto space-y-6">
-      <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div className="flex items-center gap-3">
-          <div className="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20">
-            <Mail className="w-8 h-8 text-cyan-400" />
+          <div className="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20 shrink-0">
+            <Mail className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Email Drafts</h1>
-            <p className="text-slate-400 text-sm mt-1">AI-assisted retention emails, saved and sent per customer.</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">Email Drafts</h1>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5 sm:mt-1">AI-assisted retention emails, saved and sent per customer.</p>
           </div>
         </div>
         <button
           onClick={onBack}
-          className="mt-4 md:mt-0 flex items-center gap-2 text-slate-400 hover:text-white transition-colors px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-800/50"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 text-slate-400 hover:text-white transition-colors px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-800/50 text-sm font-medium"
         >
           Back to Dashboard
         </button>
@@ -204,8 +204,8 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Composer */}
-        <div className="flex-[2] bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-[2] bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
             <select
               value={customerId}
               onChange={(e) => {
@@ -213,7 +213,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
                 setCustomerId(e.target.value);
               }}
               disabled={isSent}
-              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full md:w-auto p-2.5 outline-none transition-all disabled:opacity-50"
+              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:w-auto flex-1 min-w-[200px] p-2.5 outline-none transition-all disabled:opacity-50"
             >
               <option value="">Select a customer…</option>
               {customers.map((c) => (
@@ -226,7 +226,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
               value={tone}
               onChange={(e) => setTone(e.target.value)}
               disabled={isSent}
-              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 outline-none transition-all disabled:opacity-50"
+              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block flex-1 sm:flex-initial p-2.5 outline-none transition-all disabled:opacity-50"
             >
               {TONES.map((t) => (
                 <option key={t} value={t}>
@@ -238,7 +238,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
               value={length}
               onChange={(e) => setLength(e.target.value)}
               disabled={isSent}
-              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 outline-none transition-all disabled:opacity-50"
+              className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block flex-1 sm:flex-initial p-2.5 outline-none transition-all disabled:opacity-50"
             >
               {LENGTHS.map((l) => (
                 <option key={l} value={l}>
@@ -249,7 +249,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
             <button
               onClick={handleGenerate}
               disabled={generating || isSent}
-              className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20 disabled:opacity-50 disabled:shadow-none"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20 disabled:opacity-50 disabled:shadow-none"
             >
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
               {generating ? "Generating…" : activeDraftId ? "Regenerate with AI" : "Generate with AI"}
@@ -267,17 +267,17 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Email body — generate with AI, or write your own."
-            rows={14}
+            rows={12}
             disabled={isSent}
-            className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-3 outline-none transition-all resize-y min-h-[200px] leading-relaxed disabled:opacity-50"
+            className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-3 outline-none transition-all resize-y min-h-[180px] leading-relaxed disabled:opacity-50"
           />
 
-          <div className="flex flex-wrap items-center gap-3 mt-2">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-2">
             {!isSent && (
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 border border-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 border border-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 {saving ? "Saving…" : activeDraftId ? "Save changes" : "Save draft"}
@@ -286,7 +286,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
             <button
               onClick={handleSendTest}
               disabled={sendingTest || !activeDraftId}
-              className="flex items-center gap-2 border border-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 border border-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
               {sendingTest ? "Sending test…" : "Send test email"}
@@ -295,7 +295,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
               <button
                 onClick={handleSend}
                 disabled={sending || !activeDraftId}
-                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-emerald-500 shadow-lg shadow-emerald-900/20 disabled:opacity-50 disabled:shadow-none"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors border border-emerald-500 shadow-lg shadow-emerald-900/20 disabled:opacity-50 disabled:shadow-none"
               >
                 <Send className="w-4 h-4" />
                 {sending ? "Sending…" : "Send"}
@@ -304,7 +304,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
             {activeDraftId && (
               <button
                 onClick={resetComposer}
-                className="flex items-center gap-2 border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ml-auto"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors sm:ml-auto"
               >
                 <Edit3 className="w-4 h-4" />
                 New draft
@@ -320,7 +320,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
         </div>
 
         {/* Draft list */}
-        <div className="flex-1 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl">
+        <div className="flex-1 bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl">
           <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">
             {customerId ? "Drafts for this customer" : "All drafts"}
           </h3>
@@ -333,11 +333,11 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
               No drafts yet.
             </div>
           ) : (
-            <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
+            <div className="flex flex-col gap-3 max-h-[500px] lg:max-h-[600px] overflow-y-auto pr-1 sm:pr-2 scrollbar-thin">
               {drafts.map((d) => (
                 <div
                   key={d.id}
-                  className={`border rounded-xl p-4 transition-colors relative group ${
+                  className={`border rounded-xl p-3.5 sm:p-4 transition-colors relative group ${
                     d.id === activeDraftId
                       ? "border-cyan-500/50 bg-cyan-900/10"
                       : "border-slate-700 bg-slate-900/30 hover:border-slate-600 hover:bg-slate-800/50"
@@ -358,7 +358,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
                   </div>
                   <button
                     onClick={() => handleDelete(d.id)}
-                    className="absolute top-4 right-4 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                    className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                     title="Delete draft"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -418,8 +418,8 @@ function BatchGeneratePanel({ onGenerated }) {
             Drafts (doesn't send) one email per customer in the range, capped at 7 so each batch stays small enough
             to actually review. Customers who already have an unsent draft are skipped, so it's safe to re-run.
           </p>
-          <div className="flex flex-wrap items-end gap-4">
-            <label className="flex flex-col gap-2 text-xs text-slate-400 font-medium">
+          <div className="flex flex-wrap items-end gap-3 sm:gap-4">
+            <label className="flex flex-col gap-1.5 sm:gap-2 text-xs text-slate-400 font-medium">
               Risk from
               <div className="flex items-center gap-2">
                 <input
@@ -430,7 +430,7 @@ function BatchGeneratePanel({ onGenerated }) {
                 <span className="text-slate-500">%</span>
               </div>
             </label>
-            <label className="flex flex-col gap-2 text-xs text-slate-400 font-medium">
+            <label className="flex flex-col gap-1.5 sm:gap-2 text-xs text-slate-400 font-medium">
               to
               <div className="flex items-center gap-2">
                 <input
@@ -441,22 +441,22 @@ function BatchGeneratePanel({ onGenerated }) {
                 <span className="text-slate-500">%</span>
               </div>
             </label>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5 sm:gap-2 flex-1 sm:flex-initial min-w-[120px]">
               <span className="text-xs text-slate-400 font-medium">Tone</span>
               <select 
                 value={tone} 
                 onChange={(e) => setTone(e.target.value)}
-                className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 outline-none transition-all"
+                className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 outline-none transition-all"
               >
                 {TONES.map((t) => <option key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</option>)}
               </select>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5 sm:gap-2 flex-1 sm:flex-initial min-w-[120px]">
               <span className="text-xs text-slate-400 font-medium">Length</span>
               <select 
                 value={length} 
                 onChange={(e) => setLength(e.target.value)}
-                className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 outline-none transition-all"
+                className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 outline-none transition-all"
               >
                 {LENGTHS.map((l) => <option key={l} value={l}>{l[0].toUpperCase() + l.slice(1)}</option>)}
               </select>
@@ -464,7 +464,7 @@ function BatchGeneratePanel({ onGenerated }) {
             <button 
               onClick={handleRun} 
               disabled={running} 
-              className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20 disabled:opacity-50 h-[42px]"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20 disabled:opacity-50 h-[42px]"
             >
               {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
               {running ? "Generating batch…" : "Generate batch"}

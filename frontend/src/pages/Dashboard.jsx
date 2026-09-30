@@ -129,20 +129,20 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
     <div className="text-slate-200 font-sans selection:bg-cyan-900 pb-10">
       
       {/* Header */}
-      <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div className="flex items-center gap-3">
-          <div className="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20">
-            <Cpu className="w-8 h-8 text-cyan-400" />
+          <div className="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20 shrink-0">
+            <Cpu className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">RetainAI Dashboard</h1>
-            <p className="text-slate-400 text-sm mt-1">Live Customer Risk Assessment & Predictive Modeling</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">RetainAI Dashboard</h1>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Live Customer Risk Assessment & Predictive Modeling</p>
           </div>
         </div>
         
-        <div className="mt-4 md:mt-0 flex items-center gap-4 z-50">
+        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3 z-30">
           {/* Status Badge */}
-          <div className="hidden sm:flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+          <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-slate-700">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
@@ -198,7 +198,7 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
       </header>
 
       {/* KPI Cards section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl relative overflow-hidden group hover:border-slate-600 transition-colors">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Users className="w-16 h-16 text-emerald-500" />
@@ -382,18 +382,18 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
         </div>
       </div>
 
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h3 className="text-lg font-semibold text-white">
-            High-risk customers
+            High-Risk Customers
           </h3>
-          <div className="flex gap-4 items-center">
+          <div className="flex flex-wrap gap-2.5 sm:gap-4 items-center w-full sm:w-auto">
             {isAdmin && (
-              <div className="flex flex-col items-end">
+              <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
                 <button
                   onClick={handleSendAlert}
                   disabled={alertBusy}
-                  className="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  className="bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 w-full sm:w-auto text-center"
                 >
                   {alertBusy ? "Sending…" : "Send high-risk alert"}
                 </button>
@@ -408,7 +408,7 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
             )}
             <button
               onClick={onViewAll}
-              className="border border-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="border border-slate-600 hover:bg-slate-700 text-white px-3.5 py-2 rounded-lg text-sm font-medium transition-colors w-full sm:w-auto text-center"
             >
               View all customers
             </button>

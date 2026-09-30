@@ -24,12 +24,12 @@ export default function Settings({ onBack, isAdmin }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <h2 style={{ fontSize: 22 }}>Settings</h2>
         <button onClick={onBack} style={btnStyle}>Back to dashboard</button>
       </div>
 
-      <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--border)", paddingBottom: 4 }}>
+      <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--border)", paddingBottom: 6, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {TABS.map((t) => (
           <button
             key={t}
@@ -40,6 +40,8 @@ export default function Settings({ onBack, isAdmin }) {
               background: tab === t ? "var(--bg-1)" : "transparent",
               color: tab === t ? "var(--accent)" : "var(--text-secondary)",
               fontWeight: tab === t ? 600 : 400,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
             {t}

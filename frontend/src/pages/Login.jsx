@@ -32,12 +32,14 @@ export default function Login({ onAuthed }) {
   return (
     <div
       style={{
-        height: "100%",
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
         overflow: "hidden",
+        padding: "16px",
+        boxSizing: "border-box",
       }}
     >
       {/* A faint decaying signal line — the one visual idea for this page,
@@ -48,7 +50,7 @@ export default function Login({ onAuthed }) {
         width="100%" height="100%"
         viewBox="0 0 1000 600"
         preserveAspectRatio="xMidYMid slice"
-        style={{ position: "absolute", inset: 0, opacity: 0.5 }}
+        style={{ position: "absolute", inset: 0, opacity: 0.5, pointerEvents: "none" }}
       >
         <path
           d="M -50 220 C 120 180, 200 300, 340 260 S 520 140, 640 220 S 820 380, 1050 300"
@@ -63,11 +65,13 @@ export default function Login({ onAuthed }) {
       <div
         style={{
           position: "relative",
-          width: 360,
+          width: "100%",
+          maxWidth: 380,
           background: "var(--bg-1)",
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",
-          padding: "32px 28px",
+          padding: "28px 22px",
+          boxSizing: "border-box",
         }}
       >
         <h1 style={{ fontSize: 22, marginBottom: 4 }}>RetainAI</h1>

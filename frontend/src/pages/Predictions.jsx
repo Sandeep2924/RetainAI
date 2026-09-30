@@ -84,16 +84,17 @@ export default function Predictions({ onBack }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div className="flex flex-col gap-5 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 style={{ fontSize: 22, marginBottom: 4 }}>Predictions</h2>
-          <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-            Upload a CSV to score a batch of customers with the live model — doesn't touch your tracked
-            customer roster, just a one-off run.
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Batch Predictions</h2>
+          <p className="text-xs sm:text-sm text-slate-400">
+            Upload a CSV to score a batch of customers with the live ML model — one-off run without modifying tracked roster.
           </p>
         </div>
-        <button onClick={onBack} style={btnStyle}>Back to dashboard</button>
+        <button onClick={onBack} className="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-700/60 text-slate-200 text-xs sm:text-sm font-medium transition-colors text-center">
+          Back to Dashboard
+        </button>
       </div>
 
       {error && <p style={{ color: "var(--risk-high)", fontSize: 13 }}>{error}</p>}
@@ -151,13 +152,15 @@ export default function Predictions({ onBack }) {
 
       {results && (
         <div style={cardStyle}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <p className="text-xs sm:text-sm text-slate-400">
               {results.row_count} result(s) · model {results.model_version}
             </p>
-            <button onClick={handleDownload} style={btnStyle}>Download CSV</button>
+            <button onClick={handleDownload} className="w-full sm:w-auto px-3.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-colors text-center">
+              Download CSV
+            </button>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="overflow-x-auto w-full scrollbar-thin rounded-lg border border-slate-800">
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ textAlign: "left", color: "var(--text-muted)", fontSize: 12 }}>

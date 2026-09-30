@@ -112,10 +112,10 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
     <div className="text-slate-200 font-sans selection:bg-cyan-900 pb-10 max-w-7xl mx-auto space-y-6">
       
       {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-stretch sm:items-center">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors px-3 py-2 -ml-3 rounded-lg hover:bg-slate-800/50"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors px-3 py-2 -ml-1 sm:-ml-3 rounded-lg hover:bg-slate-800/50 text-sm font-medium w-full sm:w-auto justify-start"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
@@ -124,7 +124,7 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
         {onGenerateEmail && (
           <button
             onClick={() => onGenerateEmail(customerId)}
-            className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20"
+            className="flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-cyan-500 shadow-lg shadow-cyan-900/20 w-full sm:w-auto"
           >
             <Mail className="w-4 h-4" />
             Generate Retention Email
@@ -133,22 +133,22 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
       </div>
 
       {/* Main Profile Card */}
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 md:p-8 rounded-2xl flex flex-col lg:flex-row justify-between gap-8">
-        <div>
-          <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">{detail.name}</h2>
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 md:p-8 rounded-2xl flex flex-col lg:flex-row justify-between gap-6 lg:gap-8">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white break-words">{detail.name}</h2>
             <RiskBadge score={detail.churn_risk_score} />
           </div>
-          <p className="text-slate-400 mb-6 flex items-center gap-2">
-            <Mail className="w-4 h-4" /> {detail.email}
-            <span className="mx-2 opacity-30">|</span>
-            <span className="font-mono text-xs opacity-70">{detail.customer_id}</span>
+          <p className="text-slate-400 mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="flex items-center gap-1.5"><Mail className="w-4 h-4 shrink-0" /> {detail.email}</span>
+            <span className="hidden sm:inline mx-1 opacity-30">|</span>
+            <span className="font-mono text-xs opacity-70 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-700/50">{detail.customer_id}</span>
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
-            <UserPlus className="w-5 h-5 text-slate-500" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 bg-slate-900/50 p-3.5 sm:p-4 rounded-xl border border-slate-700/50">
+            <UserPlus className="w-5 h-5 text-slate-500 shrink-0 hidden sm:block" />
             {isAdmin ? (
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto flex-1">
                 <input
                   value={ownerInput}
                   onChange={(e) => setOwnerInput(e.target.value)}
@@ -158,7 +158,7 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
                 <button
                   onClick={handleSaveOwner}
                   disabled={savingOwner || !ownerInput.trim() || ownerInput === detail.owner_email}
-                  className="px-4 py-2.5 text-sm font-medium text-white bg-slate-700 border border-slate-600 rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50"
+                  className="px-4 py-2.5 text-sm font-medium text-white bg-slate-700 border border-slate-600 rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50 w-full sm:w-auto text-center"
                 >
                   {savingOwner ? "Saving…" : "Assign"}
                 </button>
@@ -172,9 +172,9 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
           </div>
         </div>
 
-        <div className="flex flex-col items-start lg:items-end min-w-[200px]">
-          <h3 className="text-sm font-medium text-slate-400 mb-3">Live Churn Risk Score</h3>
-          <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 w-full lg:w-auto flex flex-col items-center">
+        <div className="flex flex-col items-center lg:items-end min-w-0 sm:min-w-[200px] w-full lg:w-auto">
+          <h3 className="text-xs sm:text-sm font-medium text-slate-400 mb-2 sm:mb-3">Live Churn Risk Score</h3>
+          <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 w-full sm:w-auto flex flex-col items-center">
             <RiskMeter score={detail.churn_risk_score} width={160} />
             <p className="text-center mt-3 text-2xl font-bold text-white">
               {(detail.churn_risk_score * 100).toFixed(1)}%
@@ -184,7 +184,7 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
       </div>
 
       {/* KPI Tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <InfoTile icon={Clock} label="Account Age" value={`${detail.account_age_days} days`} />
         <InfoTile icon={Activity} label="Daily Usage" value={`${detail.daily_usage_mins} min`} />
         <InfoTile icon={LogIn} label="Login Freq" value={detail.login_frequency_raw} />
@@ -195,24 +195,24 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* SHAP Drivers */}
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl flex flex-col">
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-white">What's driving this score?</h3>
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl flex flex-col">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-white">What's driving this score?</h3>
             <p className="text-xs text-slate-400 mt-1">Red pushes risk up, green pulls it down.</p>
           </div>
-          <div className="flex-1 min-h-[250px]">
+          <div className="flex-1 min-h-[220px] sm:min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={shapData}
                 layout="vertical"
-                margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+                margin={{ top: 0, right: 15, left: -10, bottom: 0 }}
               >
                 <XAxis type="number" hide domain={shapDomain} />
                 <YAxis
                   type="category"
                   dataKey="name"
-                  width={150}
-                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  width={120}
+                  tick={{ fill: "#94a3b8", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -228,11 +228,11 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
         </div>
 
         {/* Risk Trend */}
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl flex flex-col">
-          <h3 className="text-lg font-semibold text-white mb-6">Risk Trend (Last 14 Days)</h3>
-          <div className="flex-1 min-h-[250px]">
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl flex flex-col">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6">Risk Trend (Last 14 Days)</h3>
+          <div className="flex-1 min-h-[220px] sm:min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={trend} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid stroke="#334155" strokeDasharray="3 3" vertical={false} />
                 <XAxis
                   dataKey="date"
@@ -266,23 +266,23 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
       </div>
 
       {/* CS Notes */}
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-6 rounded-2xl">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 sm:p-6 rounded-2xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <FileText className="w-5 h-5 text-slate-400" /> CS Notes
         </h3>
         
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-900/30 p-2 rounded-xl border border-slate-700/50">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 bg-slate-900/30 p-2 sm:p-3 rounded-xl border border-slate-700/50">
           <textarea
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             placeholder="Log a call, an intervention, or anything worth remembering…"
             rows={2}
-            className="flex-1 bg-transparent text-slate-200 text-sm p-3 outline-none resize-y min-h-[60px]"
+            className="flex-1 bg-transparent text-slate-200 text-sm p-2 sm:p-3 outline-none resize-y min-h-[60px]"
           />
           <button
             onClick={handleAddNote}
             disabled={addingNote || !noteText.trim()}
-            className="self-end sm:self-center mr-2 mb-2 sm:mb-0 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto self-stretch sm:self-center justify-center bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             <Send className="w-4 h-4" />
             {addingNote ? "Saving…" : "Add Note"}
@@ -323,12 +323,12 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
 
 function InfoTile({ icon: Icon, label, value }) {
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-5 rounded-2xl flex flex-col items-start hover:border-slate-600 transition-colors group">
-      <div className="p-2 bg-slate-700/50 rounded-lg mb-3 group-hover:bg-cyan-500/10 group-hover:text-cyan-400 text-slate-400 transition-colors">
-        <Icon className="w-5 h-5" />
+    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl flex flex-col items-start hover:border-slate-600 transition-colors group">
+      <div className="p-1.5 sm:p-2 bg-slate-700/50 rounded-lg mb-2 sm:mb-3 group-hover:bg-cyan-500/10 group-hover:text-cyan-400 text-slate-400 transition-colors">
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
       </div>
-      <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-lg font-semibold text-white">{value}</p>
+      <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider mb-0.5 sm:mb-1">{label}</p>
+      <p className="text-base sm:text-lg font-semibold text-white truncate max-w-full">{value}</p>
     </div>
   );
 }
@@ -336,7 +336,7 @@ function InfoTile({ icon: Icon, label, value }) {
 function HistorySection({ icon: Icon, title, rows, columns }) {
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl overflow-hidden flex flex-col">
-      <div className="px-5 py-4 border-b border-slate-700 bg-slate-800/80 flex items-center gap-2">
+      <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-700 bg-slate-800/80 flex items-center gap-2">
         <Icon className="w-4 h-4 text-slate-400" />
         <h3 className="text-sm font-semibold text-slate-200">{title}</h3>
       </div>
@@ -347,12 +347,12 @@ function HistorySection({ icon: Icon, title, rows, columns }) {
           <p className="text-sm text-slate-500">No records found.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left text-sm text-slate-300">
+        <div className="overflow-x-auto flex-1 min-w-0">
+          <table className="w-full text-left text-sm text-slate-300 min-w-[320px]">
             <thead className="text-xs text-slate-400 bg-slate-900/50 uppercase">
               <tr>
                 {columns.map((col) => (
-                  <th key={col} className="px-5 py-3 font-medium whitespace-nowrap">
+                  <th key={col} className="px-4 sm:px-5 py-3 font-medium whitespace-nowrap">
                     {col.replace(/_/g, " ")}
                   </th>
                 ))}
@@ -368,7 +368,7 @@ function HistorySection({ icon: Icon, title, rows, columns }) {
                       displayVal = new Date(displayVal).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                     }
                     return (
-                      <td key={col} className="px-5 py-3">
+                      <td key={col} className="px-4 sm:px-5 py-3 whitespace-nowrap text-xs sm:text-sm">
                         {String(displayVal)}
                       </td>
                     );
