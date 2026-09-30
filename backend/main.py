@@ -244,8 +244,11 @@ def _send_smtp_email(to_addr: str, subject: str, body: str, html_body: str = Non
             server.sendmail(from_addr, [to_addr], msg.as_string())
         return True, "sent"
     except Exception as e:
-        logging.warning(f"SMTP send failed: {e}")
-        return False, f"send failed: {e}"
+        err_msg = str(e)
+        if "550" in err_msg and "testing emails" in err_msg:
+            err_msg = "Resend Sandbox restriction: free tier only delivers emails to sandeepkumar9837146@gmail.com until a custom domain is verified at resend.com/domains"
+        logging.warning(f"SMTP send failed: {err_msg}")
+        return False, f"send failed: {err_msg}"
 
 
 def _generate_verification_code() -> str:

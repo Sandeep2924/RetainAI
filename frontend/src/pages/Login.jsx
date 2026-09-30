@@ -22,7 +22,7 @@ export default function Login({ onAuthed }) {
         const signupData = await signup(email, password);
         if (signupData.requires_verification) {
           setMode("verify");
-          setInfoNotice(signupData.message || `Verification code sent to ${email}`);
+          setInfoNotice(signupData.notice || signupData.message || `Verification code sent to ${email}`);
           if (signupData.debug_code) {
             setDebugCode(signupData.debug_code);
           }
@@ -71,7 +71,7 @@ export default function Login({ onAuthed }) {
     setResending(true);
     try {
       const res = await resendVerification(email);
-      setInfoNotice(res.message || `A new verification code was sent to ${email}`);
+      setInfoNotice(res.notice || res.message || `A new verification code was sent to ${email}`);
       if (res.debug_code) {
         setDebugCode(res.debug_code);
       }
