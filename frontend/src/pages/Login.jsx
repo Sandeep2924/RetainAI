@@ -16,6 +16,7 @@ export default function Login({ onAuthed }) {
   );
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [verificationCode, setVerificationCode] = useState(params.get("code") || "");
   const [error, setError] = useState("");
   const [infoNotice, setInfoNotice] = useState(
@@ -61,13 +62,23 @@ export default function Login({ onAuthed }) {
     e.preventDefault();
     setError("");
     setInfoNotice("");
+    if (mode === "signup") {
+      if (password.length < 8) {
+        setError("Password must be at least 8 characters.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwords do not match. Please verify your confirm password.");
+        return;
+      }
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
         const signupData = await signup(email, password);
         if (signupData.requires_verification) {
           setMode("verify");
-          setInfoNotice(signupData.notice || signupData.message || `Verification code sent to ${email}`);
+          setInfoNotice(signupData.notice || signupData.message || `Step 2: Enter the 6-digit code sent to ${email}`);
           if (signupData.debug_code) {
             setDebugCode(signupData.debug_code);
           }
@@ -184,9 +195,14 @@ export default function Login({ onAuthed }) {
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
           <h1 style={{ fontSize: 22, margin: 0 }}>RetainAI</h1>
+          {mode === "signup" && (
+            <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(6, 182, 212, 0.15)", color: "var(--accent)", borderRadius: 12, border: "1px solid rgba(6, 182, 212, 0.3)" }}>
+              Step 1 of 2: Create Account
+            </span>
+          )}
           {mode === "verify" && (
             <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(6, 182, 212, 0.15)", color: "var(--accent)", borderRadius: 12, border: "1px solid rgba(6, 182, 212, 0.3)" }}>
-              Email Verification
+              Step 2 of 2: Email Verification
             </span>
           )}
           {mode === "pending_approval" && (
@@ -195,13 +211,46 @@ export default function Login({ onAuthed }) {
             </span>
           )}
         </div>
-        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20 }}>
           {mode === "pending_approval"
             ? "Your account request is waiting for administrator approval"
             : mode === "verify"
-            ? (email ? `Enter the 6-digit code sent to ${email}` : "Enter your email address and verification code")
+            ? (email ? `Step 2: Enter the 6-digit code sent to ${email}` : "Step 2: Enter your email address and verification code")
+            : mode === "signup"
+            ? "Step 1: Set up your account credentials"
             : "Churn intelligence for your customer base"}
         </p>
+
+        {(mode === "signup" || mode === "verify") && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, padding: "8px 12px", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: mode === "signup" ? "var(--accent)" : "var(--text-muted)", fontSize: 12, fontWeight: 600 }}>
+              <span style={{
+                width: 20, height: 20, borderRadius: "50%",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                background: mode === "signup" ? "var(--accent)" : "rgba(16, 185, 129, 0.2)",
+                color: mode === "signup" ? "#0b0f1a" : "#34d399",
+                fontSize: 10, fontWeight: 700
+              }}>
+                {mode === "verify" ? "✓" : "1"}
+              </span>
+              <span>Credentials</span>
+            </div>
+            <div style={{ flex: 1, height: 2, background: mode === "verify" ? "var(--accent)" : "var(--border)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: mode === "verify" ? "var(--accent)" : "var(--text-muted)", fontSize: 12, fontWeight: 600 }}>
+              <span style={{
+                width: 20, height: 20, borderRadius: "50%",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                background: mode === "verify" ? "var(--accent)" : "transparent",
+                border: mode === "verify" ? "none" : "1px solid var(--border)",
+                color: mode === "verify" ? "#0b0f1a" : "var(--text-muted)",
+                fontSize: 10, fontWeight: 700
+              }}>
+                2
+              </span>
+              <span>Email OTP</span>
+            </div>
+          </div>
+        )}
 
         {mode === "pending_approval" ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "center" }}>
@@ -367,6 +416,23 @@ export default function Login({ onAuthed }) {
               />
             </div>
 
+            {mode === "signup" && (
+              <div>
+                <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat your password"
+                  style={inputStyle}
+                />
+              </div>
+            )}
+
             {error && (
               <div>
                 <p style={{ fontSize: 13, color: "var(--risk-high)", margin: "0 0 6px 0" }}>{error}</p>
@@ -383,7 +449,7 @@ export default function Login({ onAuthed }) {
             )}
 
             <button type="submit" disabled={busy} style={submitStyle}>
-              {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+              {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Continue to Step 2: Verify Email →"}
             </button>
           </form>
         )}
@@ -394,10 +460,14 @@ export default function Login({ onAuthed }) {
               {mode === "login" ? "New here?" : "Already have an account?"}{" "}
               <button
                 type="button"
-                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
-                style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
+                onClick={() => {
+                  setMode(mode === "login" ? "signup" : "login");
+                  setError("");
+                  setConfirmPassword("");
+                }}
+                style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer", fontWeight: 600 }}
               >
-                {mode === "login" ? "Create an account" : "Sign in"}
+                {mode === "login" ? "Create an account (2 steps)" : "Sign in"}
               </button>
             </p>
             <button
@@ -405,56 +475,15 @@ export default function Login({ onAuthed }) {
               onClick={() => {
                 setMode("verify");
                 setError("");
-                setInfoNotice("Enter your account email and 6-digit code to verify.");
+                setInfoNotice("Enter your account email and 6-digit code to complete Step 2.");
                 window.history.pushState({}, "", "/verify");
               }}
-              style={{ background: "none", border: "none", color: "#38bdf8", fontSize: 12, padding: 0, cursor: "pointer", textDecoration: "underline" }}
+              style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 12, padding: 0, cursor: "pointer", textDecoration: "underline" }}
             >
-              Have a verification code? Verify account &rarr;
+              Already registered? Complete Step 2 verification &rarr;
             </button>
           </div>
         )}
-
-        <div
-          style={{
-            marginTop: 18,
-            padding: "10px 12px",
-            background: "rgba(14, 116, 144, 0.12)",
-            border: "1px solid rgba(14, 116, 144, 0.35)",
-            borderRadius: "var(--radius-sm)",
-            fontSize: 12,
-            color: "var(--text-secondary)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "#a5f3fc", fontWeight: 600 }}>Demo Account</span>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("test@retain.in");
-                setPassword("password123");
-                setError("");
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#38bdf8",
-                fontSize: 12,
-                cursor: "pointer",
-                padding: 0,
-                textDecoration: "underline",
-              }}
-            >
-              Fill Credentials
-            </button>
-          </div>
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-            Email: <code style={{ color: "#e2e8f0" }}>test@retain.in</code> &bull; Password: <code style={{ color: "#e2e8f0" }}>password123</code>
-          </span>
-        </div>
       </div>
     </div>
   );
