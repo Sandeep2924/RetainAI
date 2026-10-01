@@ -33,7 +33,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import text
+from urllib.parse import unquote
+from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -140,7 +141,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
         email = payload.get("sub")
         if not email:
             raise HTTPException(401, "Invalid token")
-        return email
+        return email.strip().lower()
     except jwt.PyJWTError:
         raise HTTPException(401, "Invalid token")
 
@@ -153,10 +154,10 @@ def get_current_admin(current_user: str = Depends(get_current_user)) -> str:
     """Same as get_current_user, but 403s unless that user's role is 'admin'."""
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == current_user).first()
+        user = db.query(User).filter(func.lower(User.email) == current_user.strip().lower()).first()
         if not user or user.role != "admin":
             raise HTTPException(403, "Admin access required")
-        return current_user
+        return user.email
     finally:
         db.close()
 
@@ -930,31 +931,34 @@ def list_pending_users(current_admin: str = Depends(get_current_admin)):
 
 @app.post("/admin/users/{email}/approve")
 def approve_user_in_app(email: str, current_admin: str = Depends(get_current_admin)):
+    target_email = unquote(email).strip().lower()
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        user = db.query(User).filter(func.lower(User.email) == target_email).first()
         if not user:
-            raise HTTPException(404, "User not found")
+            raise HTTPException(404, f"User '{target_email}' not found")
         user.is_approved = True
+        user.is_verified = True
         user.approval_token = None
         db.commit()
         _send_user_approved_email(user.email)
-        return {"message": f"User {user.email} approved successfully.", "email": user.email, "is_approved": True}
+        return {"message": f"User {user.email} approved successfully.", "email": user.email, "is_approved": True, "is_verified": True}
     finally:
         db.close()
 
 
 @app.post("/admin/users/{email}/reject")
 def reject_user_in_app(email: str, current_admin: str = Depends(get_current_admin)):
+    target_email = unquote(email).strip().lower()
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        user = db.query(User).filter(func.lower(User.email) == target_email).first()
         if not user:
-            raise HTTPException(404, "User not found")
+            raise HTTPException(404, f"User '{target_email}' not found")
         _send_user_rejected_email(user.email)
         db.delete(user)
         db.commit()
-        return {"message": f"User {email} rejected and removed."}
+        return {"message": f"User {target_email} rejected and removed."}
     finally:
         db.close()
 
@@ -963,7 +967,7 @@ def reject_user_in_app(email: str, current_admin: str = Depends(get_current_admi
 def get_me(current_user: str = Depends(get_current_user)):
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == current_user).first()
+        user = db.query(User).filter(func.lower(User.email) == current_user.strip().lower()).first()
         if not user:
             raise HTTPException(404, "User not found")
         try:
@@ -985,7 +989,9 @@ def update_me(profile: ProfileUpdate, current_user: str = Depends(get_current_us
         raise HTTPException(400, "Name and Job Title cannot be empty")
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == current_user).first()
+        user = db.query(User).filter(func.lower(User.email) == current_user.strip().lower()).first()
+        if not user:
+            raise HTTPException(404, "User not found")
         user.name = profile.name
         user.job_title = profile.job_title
         user.company_name = profile.company_name
@@ -1003,7 +1009,7 @@ def change_password(payload: PasswordChange, current_user: str = Depends(get_cur
         raise HTTPException(400, "New password must be at least 8 characters")
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == current_user).first()
+        user = db.query(User).filter(func.lower(User.email) == current_user.strip().lower()).first()
         if not user or not verify_password(payload.current_password, user.hashed_password):
             raise HTTPException(400, "Incorrect current password")
         user.hashed_password = hash_password(payload.new_password)
@@ -1040,15 +1046,16 @@ def list_users(current_user: str = Depends(get_current_admin)):
 
 @app.put("/admin/users/{email}/role")
 def update_user_role(email: str, payload: RoleUpdate, current_user: str = Depends(get_current_admin)):
+    target_email = unquote(email).strip().lower()
     if payload.role not in ("admin", "member"):
         raise HTTPException(400, "role must be 'admin' or 'member'")
-    if email.lower() == current_user.lower() and payload.role != "admin":
+    if target_email == current_user.strip().lower() and payload.role != "admin":
         raise HTTPException(400, "You can't demote yourself")
     db = db_session()
     try:
-        user = db.query(User).filter(User.email == email).first()
+        user = db.query(User).filter(func.lower(User.email) == target_email).first()
         if not user:
-            raise HTTPException(404, "User not found")
+            raise HTTPException(404, f"User '{target_email}' not found")
         user.role = payload.role
         db.commit()
         return {"email": user.email, "role": user.role}

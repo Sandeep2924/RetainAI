@@ -26,10 +26,17 @@ export default function Team({ onBack, currentUserEmail }) {
     try {
       await approveUser(u.email);
       setUsers((prev) =>
-        prev.map((item) => (item.email === u.email ? { ...item, is_approved: true } : item))
+        prev.map((item) =>
+          item.email.toLowerCase() === u.email.toLowerCase()
+            ? { ...item, is_approved: true, is_verified: true }
+            : item
+        )
       );
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't approve user.");
+      if (err.response?.status === 404) {
+        load();
+      }
     } finally {
       setBusyEmail(null);
     }
@@ -43,9 +50,12 @@ export default function Team({ onBack, currentUserEmail }) {
     setError("");
     try {
       await rejectUser(u.email);
-      setUsers((prev) => prev.filter((item) => item.email !== u.email));
+      setUsers((prev) => prev.filter((item) => item.email.toLowerCase() !== u.email.toLowerCase()));
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't reject user.");
+      if (err.response?.status === 404) {
+        load();
+      }
     } finally {
       setBusyEmail(null);
     }
@@ -55,7 +65,7 @@ export default function Team({ onBack, currentUserEmail }) {
     const nextRole = user.role === "admin" ? "member" : "admin";
     const isSelf = user.email.toLowerCase() === (currentUserEmail || "").toLowerCase();
     if (isSelf && nextRole !== "admin") {
-      setError("You can't demote yourself.");
+      setError("You cannot demote your own admin account.");
       return;
     }
     setBusyEmail(user.email);
@@ -63,10 +73,13 @@ export default function Team({ onBack, currentUserEmail }) {
     try {
       await updateUserRole(user.email, nextRole);
       setUsers((prev) =>
-        prev.map((u) => (u.email === user.email ? { ...u, role: nextRole } : u))
+        prev.map((u) => (u.email.toLowerCase() === user.email.toLowerCase() ? { ...u, role: nextRole } : u))
       );
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't update that user's role.");
+      if (err.response?.status === 404) {
+        load();
+      }
     } finally {
       setBusyEmail(null);
     }
@@ -81,19 +94,37 @@ export default function Team({ onBack, currentUserEmail }) {
             {loading ? "Loading…" : `${users.length} teammate${users.length === 1 ? "" : "s"}`}
           </p>
         </div>
-        <button
-          onClick={onBack}
-          style={{
-            background: "none",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-sm)",
-            color: "var(--text-primary)",
-            fontSize: 13,
-            padding: "8px 14px",
-          }}
-        >
-          Back to dashboard
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={load}
+            disabled={loading}
+            style={{
+              background: "none",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-secondary)",
+              fontSize: 13,
+              padding: "8px 14px",
+              cursor: "pointer",
+            }}
+          >
+            {loading ? "Refreshing…" : "↻ Refresh"}
+          </button>
+          <button
+            onClick={onBack}
+            style={{
+              background: "none",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-primary)",
+              fontSize: 13,
+              padding: "8px 14px",
+              cursor: "pointer",
+            }}
+          >
+            Back to dashboard
+          </button>
+        </div>
       </div>
 
       <div
@@ -206,27 +237,43 @@ export default function Team({ onBack, currentUserEmail }) {
                             </button>
                           </>
                         )}
-                        <button
-                          onClick={() => handleRoleToggle(u)}
-                          disabled={busyEmail === u.email || (isSelf && u.role === "admin")}
-                          title={isSelf && u.role === "admin" ? "You can't demote yourself" : ""}
-                          style={{
-                            background: "none",
-                            border: "1px solid var(--border)",
-                            borderRadius: "var(--radius-sm)",
-                            color: "var(--text-primary)",
-                            fontSize: 12,
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                            opacity: busyEmail === u.email ? 0.6 : 1,
-                          }}
-                        >
-                          {busyEmail === u.email
-                            ? "Updating…"
-                            : u.role === "admin"
-                            ? "Make member"
-                            : "Make admin"}
-                        </button>
+                        {isSelf && u.role === "admin" ? (
+                          <span
+                            style={{
+                              fontSize: 11,
+                              color: "var(--accent)",
+                              background: "rgba(6, 182, 212, 0.1)",
+                              border: "1px solid rgba(6, 182, 212, 0.25)",
+                              borderRadius: "var(--radius-sm)",
+                              padding: "4px 8px",
+                              fontWeight: 600,
+                            }}
+                            title="You cannot demote your own admin account"
+                          >
+                            Admin (you)
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleRoleToggle(u)}
+                            disabled={busyEmail === u.email}
+                            style={{
+                              background: "none",
+                              border: "1px solid var(--border)",
+                              borderRadius: "var(--radius-sm)",
+                              color: "var(--text-primary)",
+                              fontSize: 12,
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              opacity: busyEmail === u.email ? 0.6 : 1,
+                            }}
+                          >
+                            {busyEmail === u.email
+                              ? "Updating…"
+                              : u.role === "admin"
+                              ? "Make member"
+                              : "Make admin"}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
