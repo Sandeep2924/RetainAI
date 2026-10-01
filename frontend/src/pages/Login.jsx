@@ -1,16 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login, signup, verifyEmail, resendVerification, setToken } from "../api";
 
 export default function Login({ onAuthed }) {
-  const [mode, setMode] = useState("login"); // "login" | "signup" | "verify"
-  const [email, setEmail] = useState("");
+  const params = new URLSearchParams(window.location.search);
+  const pathIsVerify = window.location.pathname.toLowerCase().includes("verify");
+  const queryIsVerify = params.get("mode") === "verify" || params.has("verify") || params.has("code");
+
+  const [mode, setMode] = useState(pathIsVerify || queryIsVerify ? "verify" : "login");
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState(params.get("code") || "");
   const [error, setError] = useState("");
-  const [infoNotice, setInfoNotice] = useState("");
+  const [infoNotice, setInfoNotice] = useState(
+    pathIsVerify || queryIsVerify ? "Enter your email address and 6-digit verification code below." : ""
+  );
   const [debugCode, setDebugCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    const urlEmail = params.get("email");
+    const urlCode = params.get("code");
+    if (urlEmail && urlCode && urlCode.trim().length === 6) {
+      setBusy(true);
+      setInfoNotice("Verifying your account from verification link…");
+      verifyEmail(urlEmail.trim(), urlCode.trim())
+        .then((data) => {
+          setToken(data.access_token);
+          onAuthed({ email: urlEmail.trim(), role: data.role });
+        })
+        .catch((err) => {
+          setError(err.response?.data?.detail || "Invalid or expired verification link.");
+          setBusy(false);
+        });
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,6 +50,7 @@ export default function Login({ onAuthed }) {
           if (signupData.debug_code) {
             setDebugCode(signupData.debug_code);
           }
+          window.history.pushState({}, "", "/verify");
           return;
         }
       }
@@ -44,6 +69,10 @@ export default function Login({ onAuthed }) {
 
   async function handleVerify(e) {
     e.preventDefault();
+    if (!email.trim()) {
+      setError("Please enter your account email address.");
+      return;
+    }
     if (!verificationCode.trim()) {
       setError("Please enter the 6-digit verification code.");
       return;
@@ -52,9 +81,9 @@ export default function Login({ onAuthed }) {
     setInfoNotice("");
     setBusy(true);
     try {
-      const data = await verifyEmail(email, verificationCode.trim());
+      const data = await verifyEmail(email.trim(), verificationCode.trim());
       setToken(data.access_token);
-      onAuthed({ email, role: data.role });
+      onAuthed({ email: email.trim(), role: data.role });
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid or expired verification code.");
     } finally {
@@ -63,14 +92,14 @@ export default function Login({ onAuthed }) {
   }
 
   async function handleResendCode() {
-    if (!email) {
+    if (!email.trim()) {
       setError("Email address is required to resend verification code.");
       return;
     }
     setError("");
     setResending(true);
     try {
-      const res = await resendVerification(email);
+      const res = await resendVerification(email.trim());
       setInfoNotice(res.notice || res.message || `A new verification code was sent to ${email}`);
       if (res.debug_code) {
         setDebugCode(res.debug_code);
@@ -137,7 +166,7 @@ export default function Login({ onAuthed }) {
         </div>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 24 }}>
           {mode === "verify"
-            ? `Enter the 6-digit code sent to ${email}`
+            ? (email ? `Enter the 6-digit code sent to ${email}` : "Enter your email address and verification code")
             : "Churn intelligence for your customer base"}
         </p>
 
@@ -145,13 +174,26 @@ export default function Login({ onAuthed }) {
           <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
-                Verification Code
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+                6-Digit Verification Code
               </label>
               <input
                 type="text"
                 required
                 maxLength={6}
-                autoFocus
+                autoFocus={!!email}
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="123456"
@@ -204,7 +246,12 @@ export default function Login({ onAuthed }) {
               </button>
               <button
                 type="button"
-                onClick={() => { setMode("login"); setError(""); setInfoNotice(""); }}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                  setInfoNotice("");
+                  window.history.pushState({}, "", "/");
+                }}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", padding: 0, cursor: "pointer" }}
               >
                 Back to Sign in
@@ -263,16 +310,30 @@ export default function Login({ onAuthed }) {
         )}
 
         {mode !== "verify" && (
-          <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 20, textAlign: "center" }}>
-            {mode === "login" ? "New here?" : "Already have an account?"}{" "}
+          <div style={{ marginTop: 20, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
+              {mode === "login" ? "New here?" : "Already have an account?"}{" "}
+              <button
+                type="button"
+                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
+                style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
+              >
+                {mode === "login" ? "Create an account" : "Sign in"}
+              </button>
+            </p>
             <button
               type="button"
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
-              style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, padding: 0, cursor: "pointer" }}
+              onClick={() => {
+                setMode("verify");
+                setError("");
+                setInfoNotice("Enter your account email and 6-digit code to verify.");
+                window.history.pushState({}, "", "/verify");
+              }}
+              style={{ background: "none", border: "none", color: "#38bdf8", fontSize: 12, padding: 0, cursor: "pointer", textDecoration: "underline" }}
             >
-              {mode === "login" ? "Create an account" : "Sign in"}
+              Have a verification code? Verify account &rarr;
             </button>
-          </p>
+          </div>
         )}
 
         <div

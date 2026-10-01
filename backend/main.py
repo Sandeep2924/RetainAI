@@ -257,12 +257,21 @@ def _generate_verification_code() -> str:
 
 
 def _send_verification_email(email: str, code: str) -> tuple[bool, str]:
+    import urllib.parse
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+    verify_url = f"{frontend_url}/verify?email={urllib.parse.quote(email)}&code={code}"
+
     subject = f"Verify your RetainAI account — Code: {code}"
     plain_body = f"""Welcome to RetainAI!
 
 Your 6-digit verification code is: {code}
 
-Enter this code on the verification screen to activate your account.
+You can verify automatically by opening this link:
+{verify_url}
+
+Or enter your 6-digit code on the verification screen:
+{code}
+
 This verification code is valid for 15 minutes.
 
 If you did not request this verification email, please safely disregard it.
@@ -285,13 +294,21 @@ If you did not request this verification email, please safely disregard it.
     <div style="padding: 32px 28px;">
       <div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 12px;">Confirm your email address</div>
       <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 24px;">
-        Welcome to RetainAI. Use the 6-digit verification code below to verify your email address and activate your account:
+        Welcome to RetainAI. Use the 6-digit verification code below, or click the button to verify your email automatically:
       </p>
       <div style="background: #020617; border: 2px dashed #06b6d4; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #38bdf8; font-weight: 600; margin-bottom: 8px;">Verification Code</div>
         <div style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #22d3ee; margin: 0;">{code}</div>
       </div>
-      <p style="font-size: 13px; text-align: center; margin-bottom: 0; color: #94a3b8;">
+      <div style="text-align: center; margin: 24px 0 16px;">
+        <a href="{verify_url}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%); color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 13px 30px; border-radius: 8px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);">
+          Verify &amp; Activate Account &rarr;
+        </a>
+      </div>
+      <p style="font-size: 12px; text-align: center; color: #64748b; margin-top: 10px; word-break: break-all;">
+        Direct link: <a href="{verify_url}" style="color: #38bdf8; text-decoration: underline;">{verify_url}</a>
+      </p>
+      <p style="font-size: 13px; text-align: center; margin-top: 16px; color: #94a3b8;">
         ⏳ This code will expire in <strong style="color: #f1f5f9;">15 minutes</strong>.
       </p>
       <div style="font-size: 12px; color: #64748b; line-height: 1.5; margin-top: 24px; padding-top: 16px; border-top: 1px solid #1e293b;">
@@ -423,52 +440,71 @@ def signup(user: UserCreate):
         db.close()
 
 
-@app.post("/verify-email")
-def verify_email(req: EmailVerificationRequest):
-    db = db_session()
-    try:
-        user_email = req.email.strip().lower()
-        code_input = req.code.strip()
-        user = db.query(User).filter(User.email == user_email).first()
-        if not user:
-            raise HTTPException(404, "No account found with this email.")
+def _process_verification(db, email: str, code: str) -> dict:
+    user_email = email.strip().lower()
+    code_input = code.strip()
+    user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise HTTPException(404, "No account found with this email.")
 
-        if getattr(user, "is_verified", False):
-            return {
-                "message": "Account already verified. Welcome back!",
-                "access_token": create_access_token(user.email),
-                "token_type": "bearer",
-                "role": user.role,
-                "is_verified": True,
-            }
-
-        if not user.verification_code:
-            raise HTTPException(400, "No pending verification code found. Please request a new code.")
-
-        now = datetime.now(timezone.utc)
-        expires_at = user.verification_code_expires_at
-        if expires_at:
-            if expires_at.tzinfo is None:
-                expires_at = expires_at.replace(tzinfo=timezone.utc)
-            if now > expires_at:
-                raise HTTPException(400, "Verification code has expired. Please click 'Resend code' to get a new one.")
-
-        if user.verification_code != code_input:
-            raise HTTPException(400, "Invalid verification code. Please check your email and try again.")
-
-        # Mark user as verified in DB
-        user.is_verified = True
-        user.verification_code = None
-        user.verification_code_expires_at = None
-        db.commit()
-
+    if getattr(user, "is_verified", False):
         return {
-            "message": "Account verified successfully! Welcome to RetainAI.",
+            "message": "Account already verified. Welcome back!",
             "access_token": create_access_token(user.email),
             "token_type": "bearer",
             "role": user.role,
             "is_verified": True,
         }
+
+    if not user.verification_code:
+        raise HTTPException(400, "No pending verification code found. Please request a new code.")
+
+    now = datetime.now(timezone.utc)
+    expires_at = user.verification_code_expires_at
+    if expires_at:
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if now > expires_at:
+            raise HTTPException(400, "Verification code has expired. Please click 'Resend code' to get a new one.")
+
+    if user.verification_code != code_input:
+        raise HTTPException(400, "Invalid verification code. Please check your email and try again.")
+
+    # Mark user as verified in DB
+    user.is_verified = True
+    user.verification_code = None
+    user.verification_code_expires_at = None
+    db.commit()
+
+    return {
+        "message": "Account verified successfully! Welcome to RetainAI.",
+        "access_token": create_access_token(user.email),
+        "token_type": "bearer",
+        "role": user.role,
+        "is_verified": True,
+    }
+
+
+@app.post("/verify-email")
+@app.post("/verify")
+def verify_email(req: EmailVerificationRequest):
+    db = db_session()
+    try:
+        return _process_verification(db, req.email, req.code)
+    finally:
+        db.close()
+
+
+@app.get("/verify-email")
+@app.get("/verify")
+def verify_email_get(email: str, code: str):
+    db = db_session()
+    try:
+        res = _process_verification(db, email, code)
+        token = res.get("access_token", "")
+        frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(f"{frontend_url}/?token={token}&verified=true", status_code=303)
     finally:
         db.close()
 

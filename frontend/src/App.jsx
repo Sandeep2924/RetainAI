@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getToken, clearToken, fetchMe, fetchAppSettings } from "./api";
+import { getToken, setToken, clearToken, fetchMe, fetchAppSettings } from "./api";
 import { setRiskThresholds } from "./risk";
 import Sidebar from "./components/Sidebar";
 import Login from "./pages/Login";
@@ -22,6 +22,14 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    // Check if URL has token from redirect (e.g. /?token=...&verified=true)
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    if (urlToken) {
+      setToken(urlToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     if (!getToken()) {
       setAuthState("unauthed");
       return;
