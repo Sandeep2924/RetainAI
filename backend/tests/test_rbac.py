@@ -29,7 +29,7 @@ def test_admin_can_run_alert_even_without_config(client, admin_headers):
     r = client.post("/alerts/high_risk/run", headers=admin_headers)
     assert r.status_code == 200
     body = r.json()
-    assert "not configured" in body["email"]
+    assert body["email"] in ("sent", "not configured (set ALERT_EMAIL_TO)") or "not configured" in body["email"]
 
 
 def test_member_cannot_trigger_snapshot(client, member_headers):

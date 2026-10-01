@@ -50,6 +50,14 @@ def engineer_from_events(account_age_days, logins_30d, avg_usage_7d_mins, latest
     }
 
 
+def engineer_dataframe(df):
+    """Transforms a DataFrame containing raw features into model-ready features."""
+    res = df.copy()
+    if "Last_Support_Ticket" in res.columns:
+        res["Last_Support_Ticket"] = res["Last_Support_Ticket"].apply(ticket_urgency_score)
+    return res
+
+
 # Windows used everywhere features are computed, so pipeline.py and any
 # ad-hoc trend/backfill code stay consistent.
 LOGIN_WINDOW_DAYS = 30

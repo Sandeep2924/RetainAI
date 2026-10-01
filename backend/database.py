@@ -22,7 +22,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import (
-    create_engine, Column, String, Float, Integer, DateTime, Text, Date, ForeignKey, text, Boolean
+    create_engine, Column, String, Float, Integer, DateTime, Text, Date, ForeignKey, text, Boolean, UniqueConstraint
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
@@ -188,6 +188,20 @@ class Report(Base):
     created_by = Column(String, nullable=True)
     created_at = Column(DateTime, default=_utcnow)
     result_json = Column(Text, nullable=False, default="{}")
+
+
+class RiskScoreSnapshot(Base):
+    """One row per customer per day. Populated by the daily snapshot job
+    (scripts/snapshot_risk_scores.py) or the admin-triggered endpoint."""
+    __tablename__ = "risk_score_snapshots"
+    __table_args__ = (UniqueConstraint("customer_id", "snapshot_date", name="uq_customer_day"),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(String, nullable=False, index=True)
+    snapshot_date = Column(Date, nullable=False)
+    churn_risk_score = Column(Float, nullable=False)
+    top_driver = Column(String, nullable=True)
+    created_at = Column(DateTime, default=_utcnow)
 
 
 class AppSetting(Base):

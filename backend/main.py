@@ -797,11 +797,31 @@ def customer_risk_trend(customer_id: str, days: int = 14, current_user: str = De
     if cached:
         return cached
 
-    points = pipeline.get_customer_trend(customer_id, days)
+    db = db_session()
+    source = "reconstructed"
+    points = None
+    try:
+        from models import RiskScoreSnapshot
+        from datetime import date
+        cutoff = date.today() - timedelta(days=days)
+        recorded = (
+            db.query(RiskScoreSnapshot)
+            .filter(RiskScoreSnapshot.customer_id == customer_id, RiskScoreSnapshot.snapshot_date >= cutoff)
+            .order_by(RiskScoreSnapshot.snapshot_date.asc())
+            .all()
+        )
+        if len(recorded) >= 3:
+            source = "recorded"
+            points = [{"date": r.snapshot_date.isoformat(), "churn_risk_score": r.churn_risk_score} for r in recorded]
+    finally:
+        db.close()
+
+    if points is None:
+        points = pipeline.get_customer_trend(customer_id, days)
     if points is None:
         raise HTTPException(404, "Customer not found")
 
-    result = {"customer_id": customer_id, "trend": points}
+    result = {"customer_id": customer_id, "trend": points, "source": source}
     cache.set_cached(cache_key, result, ttl_seconds=300)
     return result
 
@@ -1276,25 +1296,56 @@ def _send_slack_alert(webhook_url: str, high_risk_df: pd.DataFrame) -> bool:
         return False
 
 
-def _send_email_alert(high_risk_df: pd.DataFrame) -> bool:
-    host, user = os.environ.get("SMTP_HOST"), os.environ.get("SMTP_USER")
-    password, to_addr = os.environ.get("SMTP_PASSWORD"), os.environ.get("ALERT_EMAIL_TO")
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    if not all([host, user, password, to_addr]):
-        return False
-    body = "\n".join(f"- {r['name']} ({r['email']}) — {round(r['churn_risk_score']*100)}% risk"
-                      for _, r in high_risk_df.iterrows())
-    msg = MIMEText(body)
-    msg["Subject"] = f"RetainAI: {len(high_risk_df)} customers at high churn risk"
-    msg["From"], msg["To"] = user, to_addr
-    try:
-        with smtplib.SMTP(host, port, timeout=10) as server:
-            server.starttls()
-            server.login(user, password)
-            server.sendmail(user, [to_addr], msg.as_string())
-        return True
-    except Exception:
-        return False
+def _send_email_alert(high_risk_df: pd.DataFrame) -> tuple[bool, str]:
+    to_addr = os.environ.get("ALERT_EMAIL_TO")
+    if not to_addr:
+        return False, "not configured (set ALERT_EMAIL_TO)"
+
+    count = len(high_risk_df)
+    subject = f"RetainAI Alert: {count} customers at high churn risk"
+    plain_body = f"RetainAI High-Risk Alert\n\n{count} customers are currently above the high-risk threshold:\n\n"
+    plain_body += "\n".join(
+        f"• {r.get('name', 'Customer')} ({r.get('email', 'N/A')}) — {round(float(r.get('churn_risk_score', 0)) * 100)}% risk"
+        for _, r in high_risk_df.head(20).iterrows()
+    )
+    if count > 20:
+        plain_body += f"\n\n... and {count - 20} more customers. View all in RetainAI Dashboard."
+
+    html_body = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155;">
+    <h2 style="color: #f43f5e; margin-top: 0;">⚠️ RetainAI High-Risk Churn Alert</h2>
+    <p style="color: #94a3b8; font-size: 14px;"><strong>{count}</strong> customers are currently flagged as high churn risk.</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px;">
+      <thead>
+        <tr style="border-bottom: 1px solid #475569; text-align: left; color: #94a3b8;">
+          <th style="padding: 8px;">Customer</th>
+          <th style="padding: 8px;">Email</th>
+          <th style="padding: 8px; text-align: right;">Risk Score</th>
+        </tr>
+      </thead>
+      <tbody>
+"""
+    for _, r in high_risk_df.head(15).iterrows():
+        score_pct = round(float(r.get('churn_risk_score', 0)) * 100)
+        html_body += f"""
+        <tr style="border-bottom: 1px solid #334155;">
+          <td style="padding: 8px; color: #f1f5f9;">{r.get('name', 'N/A')}</td>
+          <td style="padding: 8px; color: #94a3b8;">{r.get('email', 'N/A')}</td>
+          <td style="padding: 8px; text-align: right; color: #f43f5e; font-weight: bold;">{score_pct}%</td>
+        </tr>"""
+    html_body += """
+      </tbody>
+    </table>
+    <p style="margin-top: 20px; font-size: 12px; color: #64748b;">
+      Generated automatically by RetainAI Intelligent Churn Prevention System.
+    </p>
+  </div>
+</body>
+</html>"""
+
+    return _send_smtp_email(to_addr, subject, plain_body, html_body)
 
 
 @app.post("/alerts/high_risk/run")
@@ -1307,11 +1358,11 @@ def run_high_risk_alert(threshold: Optional[float] = None, current_user: str = D
 
     slack_webhook = os.environ.get("SLACK_WEBHOOK_URL")
     slack_sent = _send_slack_alert(slack_webhook, high_risk_df) if slack_webhook else None
-    email_sent = _send_email_alert(high_risk_df)
+    email_ok, email_detail = _send_email_alert(high_risk_df)
     return {
         "count": len(high_risk_df),
         "slack": "sent" if slack_sent else ("failed" if slack_sent is False else "not configured (set SLACK_WEBHOOK_URL)"),
-        "email": "sent" if email_sent else "not configured (set SMTP_* vars)",
+        "email": "sent" if email_ok else email_detail,
     }
 
 
@@ -2288,6 +2339,16 @@ def trigger_rescore(current_user: str = Depends(get_current_admin)):
     n = pipeline.run_scoring_pass()
     cache.delete_cached("customers:scored")
     return {"message": "Scoring complete", "rows_scored": n, "duration_seconds": round(time.time() - start, 2)}
+
+
+@app.post("/admin/snapshot_risk_scores")
+def trigger_snapshot(current_user: str = Depends(get_current_admin)):
+    import scoring
+    db = db_session()
+    try:
+        return scoring.write_daily_snapshot(db)
+    finally:
+        db.close()
 
 
 if __name__ == "__main__":
