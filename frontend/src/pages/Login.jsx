@@ -5,8 +5,15 @@ export default function Login({ onAuthed }) {
   const params = new URLSearchParams(window.location.search);
   const pathIsVerify = window.location.pathname.toLowerCase().includes("verify");
   const queryIsVerify = params.get("mode") === "verify" || params.has("verify") || params.has("code");
+  const isPendingApprovalParam = params.get("pending_approval") === "true";
 
-  const [mode, setMode] = useState(pathIsVerify || queryIsVerify ? "verify" : "login");
+  const [mode, setMode] = useState(
+    isPendingApprovalParam
+      ? "pending_approval"
+      : pathIsVerify || queryIsVerify
+      ? "verify"
+      : "login"
+  );
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
   const [verificationCode, setVerificationCode] = useState(params.get("code") || "");
@@ -21,13 +28,27 @@ export default function Login({ onAuthed }) {
   useEffect(() => {
     const urlEmail = params.get("email");
     const urlCode = params.get("code");
+    const isPending = params.get("pending_approval") === "true";
+
+    if (isPending) {
+      setMode("pending_approval");
+      if (urlEmail) setEmail(urlEmail);
+      return;
+    }
+
     if (urlEmail && urlCode && urlCode.trim().length === 6) {
       setBusy(true);
       setInfoNotice("Verifying your account from verification link…");
       verifyEmail(urlEmail.trim(), urlCode.trim())
         .then((data) => {
-          setToken(data.access_token);
-          onAuthed({ email: urlEmail.trim(), role: data.role });
+          if (data.requires_approval || !data.access_token) {
+            setMode("pending_approval");
+            setInfoNotice(data.message || "Email verified! Awaiting administrator approval.");
+            setBusy(false);
+          } else {
+            setToken(data.access_token);
+            onAuthed({ email: urlEmail.trim(), role: data.role });
+          }
         })
         .catch((err) => {
           setError(err.response?.data?.detail || "Invalid or expired verification link.");
@@ -82,8 +103,13 @@ export default function Login({ onAuthed }) {
     setBusy(true);
     try {
       const data = await verifyEmail(email.trim(), verificationCode.trim());
-      setToken(data.access_token);
-      onAuthed({ email: email.trim(), role: data.role });
+      if (data.requires_approval || !data.access_token) {
+        setMode("pending_approval");
+        setInfoNotice(data.message || "Email verified! Awaiting administrator approval.");
+      } else {
+        setToken(data.access_token);
+        onAuthed({ email: email.trim(), role: data.role });
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid or expired verification code.");
     } finally {
@@ -163,14 +189,67 @@ export default function Login({ onAuthed }) {
               Email Verification
             </span>
           )}
+          {mode === "pending_approval" && (
+            <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(245, 158, 11, 0.15)", color: "#f59e0b", borderRadius: 12, border: "1px solid rgba(245, 158, 11, 0.3)" }}>
+              Awaiting Approval
+            </span>
+          )}
         </div>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 24 }}>
-          {mode === "verify"
+          {mode === "pending_approval"
+            ? "Your account request is waiting for administrator approval"
+            : mode === "verify"
             ? (email ? `Enter the 6-digit code sent to ${email}` : "Enter your email address and verification code")
             : "Churn intelligence for your customer base"}
         </p>
 
-        {mode === "verify" ? (
+        {mode === "pending_approval" ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "center" }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: "50%",
+              background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)",
+              color: "#34d399", fontSize: 24, display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 4px"
+            }}>
+              ✓
+            </div>
+            <div>
+              <h3 style={{ margin: "0 0 6px 0", fontSize: 17, color: "var(--text-primary)" }}>
+                Email Verified Successfully!
+              </h3>
+              <span style={{
+                display: "inline-block", background: "rgba(14, 116, 144, 0.2)",
+                color: "#38bdf8", padding: "3px 10px", borderRadius: 9999,
+                fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase"
+              }}>
+                Awaiting Admin Approval
+              </span>
+            </div>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+              Your email address <strong style={{ color: "var(--accent)" }}>{email}</strong> has been confirmed.
+              An approval request was sent to the administrator (<strong style={{ color: "#e2e8f0" }}>sandeepkumar9837146@gmail.com</strong>).
+            </p>
+            <div style={{
+              background: "var(--bg-2)", border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)", padding: "12px 14px", fontSize: 12,
+              color: "var(--text-muted)", textAlign: "left", lineHeight: 1.5
+            }}>
+              📧 You will receive an email confirmation at <strong>{email}</strong> once your account has been approved. You can then return to sign in.
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setInfoNotice("");
+                window.history.pushState({}, "", "/");
+              }}
+              style={submitStyle}
+            >
+              Back to Sign in
+            </button>
+          </div>
+        ) : mode === "verify" ? (
           <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
@@ -309,7 +388,7 @@ export default function Login({ onAuthed }) {
           </form>
         )}
 
-        {mode !== "verify" && (
+        {mode !== "verify" && mode !== "pending_approval" && (
           <div style={{ marginTop: 20, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
             <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
               {mode === "login" ? "New here?" : "Already have an account?"}{" "}

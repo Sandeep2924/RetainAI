@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchTeam, updateUserRole } from "../api";
+import { fetchTeam, updateUserRole, approveUser, rejectUser } from "../api";
 
 export default function Team({ onBack, currentUserEmail }) {
   const [users, setUsers] = useState([]);
@@ -18,6 +18,37 @@ export default function Team({ onBack, currentUserEmail }) {
       .then(setUsers)
       .catch(() => setError("Couldn't load team members. Is the backend running?"))
       .finally(() => setLoading(false));
+  }
+
+  async function handleApprove(u) {
+    setBusyEmail(u.email);
+    setError("");
+    try {
+      await approveUser(u.email);
+      setUsers((prev) =>
+        prev.map((item) => (item.email === u.email ? { ...item, is_approved: true } : item))
+      );
+    } catch (err) {
+      setError(err.response?.data?.detail || "Couldn't approve user.");
+    } finally {
+      setBusyEmail(null);
+    }
+  }
+
+  async function handleReject(u) {
+    if (!window.confirm(`Are you sure you want to reject and remove ${u.email}?`)) {
+      return;
+    }
+    setBusyEmail(u.email);
+    setError("");
+    try {
+      await rejectUser(u.email);
+      setUsers((prev) => prev.filter((item) => item.email !== u.email));
+    } catch (err) {
+      setError(err.response?.data?.detail || "Couldn't reject user.");
+    } finally {
+      setBusyEmail(null);
+    }
   }
 
   async function handleRoleToggle(user) {
@@ -90,12 +121,15 @@ export default function Team({ onBack, currentUserEmail }) {
                 <th style={{ padding: "8px 10px", fontWeight: 500 }}>Name</th>
                 <th style={{ padding: "8px 10px", fontWeight: 500 }}>Email</th>
                 <th style={{ padding: "8px 10px", fontWeight: 500 }}>Role</th>
-                <th style={{ padding: "8px 10px", fontWeight: 500 }}></th>
+                <th style={{ padding: "8px 10px", fontWeight: 500 }}>Status</th>
+                <th style={{ padding: "8px 10px", fontWeight: 500, textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => {
                 const isSelf = u.email.toLowerCase() === (currentUserEmail || "").toLowerCase();
+                const isApproved = u.is_approved !== false;
+                const isVerified = u.is_verified !== false;
                 return (
                   <tr key={u.email} style={{ borderTop: "1px solid var(--border)" }}>
                     <td style={{ padding: "10px" }}>{u.name || "—"}</td>
@@ -118,27 +152,82 @@ export default function Team({ onBack, currentUserEmail }) {
                         {u.role}
                       </span>
                     </td>
+                    <td style={{ padding: "10px" }}>
+                      {!isVerified ? (
+                        <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(100, 116, 139, 0.2)", color: "#94a3b8", borderRadius: 10 }}>
+                          Unverified
+                        </span>
+                      ) : !isApproved ? (
+                        <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(245, 158, 11, 0.15)", color: "#f59e0b", borderRadius: 10, fontWeight: 600 }}>
+                          Pending Approval
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 11, padding: "2px 8px", background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderRadius: 10, fontWeight: 600 }}>
+                          Active
+                        </span>
+                      )}
+                    </td>
                     <td style={{ padding: "10px", textAlign: "right" }}>
-                      <button
-                        onClick={() => handleRoleToggle(u)}
-                        disabled={busyEmail === u.email || (isSelf && u.role === "admin")}
-                        title={isSelf && u.role === "admin" ? "You can't demote yourself" : ""}
-                        style={{
-                          background: "none",
-                          border: "1px solid var(--border)",
-                          borderRadius: "var(--radius-sm)",
-                          color: "var(--text-primary)",
-                          fontSize: 12,
-                          padding: "6px 10px",
-                          opacity: busyEmail === u.email ? 0.6 : 1,
-                        }}
-                      >
-                        {busyEmail === u.email
-                          ? "Updating…"
-                          : u.role === "admin"
-                          ? "Make member"
-                          : "Make admin"}
-                      </button>
+                      <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                        {!isApproved && (
+                          <>
+                            <button
+                              onClick={() => handleApprove(u)}
+                              disabled={busyEmail === u.email}
+                              style={{
+                                background: "#059669",
+                                border: "none",
+                                borderRadius: "var(--radius-sm)",
+                                color: "#ffffff",
+                                fontSize: 12,
+                                fontWeight: 600,
+                                padding: "5px 10px",
+                                cursor: "pointer",
+                                opacity: busyEmail === u.email ? 0.6 : 1,
+                              }}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleReject(u)}
+                              disabled={busyEmail === u.email}
+                              style={{
+                                background: "rgba(239, 68, 68, 0.15)",
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                borderRadius: "var(--radius-sm)",
+                                color: "#f87171",
+                                fontSize: 12,
+                                padding: "5px 10px",
+                                cursor: "pointer",
+                                opacity: busyEmail === u.email ? 0.6 : 1,
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => handleRoleToggle(u)}
+                          disabled={busyEmail === u.email || (isSelf && u.role === "admin")}
+                          title={isSelf && u.role === "admin" ? "You can't demote yourself" : ""}
+                          style={{
+                            background: "none",
+                            border: "1px solid var(--border)",
+                            borderRadius: "var(--radius-sm)",
+                            color: "var(--text-primary)",
+                            fontSize: 12,
+                            padding: "5px 10px",
+                            cursor: "pointer",
+                            opacity: busyEmail === u.email ? 0.6 : 1,
+                          }}
+                        >
+                          {busyEmail === u.email
+                            ? "Updating…"
+                            : u.role === "admin"
+                            ? "Make member"
+                            : "Make admin"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

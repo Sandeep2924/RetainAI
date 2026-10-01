@@ -71,6 +71,8 @@ class User(Base):
     is_verified = Column(Boolean, nullable=False, default=False)
     verification_code = Column(String, nullable=True)
     verification_code_expires_at = Column(DateTime, nullable=True)
+    is_approved = Column(Boolean, nullable=False, default=False)
+    approval_token = Column(String, nullable=True)
 
 
 class MLCustomer(Base):
@@ -303,9 +305,19 @@ def init_all_tables():
             conn.execute(text(
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMP"
             ))
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_approved BOOLEAN NOT NULL DEFAULT FALSE"
+            ))
+            conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS approval_token VARCHAR"
+            ))
             # Pre-verify all existing accounts created before verification was required
             conn.execute(text(
                 "UPDATE users SET is_verified = TRUE WHERE is_verified IS FALSE AND verification_code IS NULL"
+            ))
+            # Pre-approve admin and any existing verified accounts so current access is not disrupted
+            conn.execute(text(
+                "UPDATE users SET is_approved = TRUE WHERE email IN ('sandeepkumar9837146@gmail.com', 'test@retain.in') OR (is_verified = TRUE AND is_approved IS FALSE)"
             ))
     except Exception as e:
         import logging

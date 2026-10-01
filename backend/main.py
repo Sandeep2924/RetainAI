@@ -82,9 +82,11 @@ ALGORITHM = "HS256"
 DEFAULT_HIGH_RISK_THRESHOLD = 0.7  # used until an admin overrides it via /settings/app
 SCORING_INTERVAL_SECONDS = int(os.environ.get("SCORING_INTERVAL_SECONDS", "60"))
 # Emails in this list get "admin" role automatically on signup. Comma-separated.
+ADMIN_APPROVAL_EMAIL = os.environ.get("ADMIN_APPROVAL_EMAIL", "sandeepkumar9837146@gmail.com").strip().lower()
 ADMIN_EMAILS = {
-    e.strip().lower() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()
+    e.strip().lower() for e in os.environ.get("ADMIN_EMAILS", "sandeepkumar9837146@gmail.com").split(",") if e.strip()
 }
+ADMIN_EMAILS.add("sandeepkumar9837146@gmail.com")
 
 if ENV == "production":
     if not SECRET_KEY or len(SECRET_KEY) < 32:
@@ -330,6 +332,188 @@ If you did not request this verification email, please safely disregard it.
     return ok, detail
 
 
+def _send_admin_approval_request_email(user_email: str, approval_token: str) -> tuple[bool, str]:
+    import urllib.parse
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8001").rstrip("/")
+    approve_url = f"{backend_url}/admin/approve-account?token={approval_token}&email={urllib.parse.quote(user_email)}&action=approve"
+    reject_url = f"{backend_url}/admin/approve-account?token={approval_token}&email={urllib.parse.quote(user_email)}&action=reject"
+
+    subject = f"Action Required: New RetainAI Account Request for {user_email}"
+    plain_body = f"""RetainAI Administrator Action Required:
+
+A new user has verified their email address and is requesting access to RetainAI:
+
+Email: {user_email}
+Status: Email Verified (Pending Admin Approval)
+Timestamp: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+To APPROVE this account and grant access:
+{approve_url}
+
+To REJECT this account request:
+{reject_url}
+
+— RetainAI Security & Access Control
+"""
+
+    html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Account Approval Request — RetainAI</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #e2e8f0; margin: 0; padding: 30px 15px;">
+  <div style="max-width: 560px; margin: 0 auto; background-color: #0f172a; border: 1px solid #334155; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
+    <div style="background: linear-gradient(135deg, #0e7490 0%, #0369a1 100%); padding: 26px 24px; text-align: center;">
+      <h1 style="margin: 0; font-size: 26px; color: #ffffff; font-weight: 800; letter-spacing: -0.5px;">RetainAI Admin</h1>
+      <p style="margin: 6px 0 0 0; color: #a5f3fc; font-size: 13px;">Security &amp; Account Approval Request</p>
+    </div>
+    <div style="padding: 30px 26px;">
+      <div style="display: inline-block; background: #0369a1; color: #e0f2fe; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 9999px; margin-bottom: 14px;">
+        Action Required
+      </div>
+      <div style="font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">
+        New Account Approval Needed
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 20px;">
+        A new user has successfully verified their email address and is requesting an account on your RetainAI instance. Please review and approve or reject this request.
+      </p>
+
+      <div style="background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 18px 20px; margin-bottom: 26px;">
+        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+          <tr>
+            <td style="color: #64748b; padding: 6px 0; width: 130px;">Requesting User:</td>
+            <td style="color: #38bdf8; font-weight: 600; padding: 6px 0;">{user_email}</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Email Verification:</td>
+            <td style="color: #4ade80; font-weight: 600; padding: 6px 0;">&#10003; Verified via OTP</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Requested Role:</td>
+            <td style="color: #f1f5f9; padding: 6px 0;">Member</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Requested At:</td>
+            <td style="color: #94a3b8; padding: 6px 0;">{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin: 26px 0 20px;">
+        <table style="margin: 0 auto; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 0 8px;">
+              <a href="{approve_url}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; font-weight: 700; font-size: 14px; padding: 13px 26px; border-radius: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                &#10003; Approve Account
+              </a>
+            </td>
+            <td style="padding: 0 8px;">
+              <a href="{reject_url}" target="_blank" style="display: inline-block; background: #334155; color: #f87171; text-decoration: none; font-weight: 600; font-size: 14px; padding: 13px 22px; border-radius: 8px; border: 1px solid #475569;">
+                &#10005; Reject Request
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="font-size: 12px; text-align: center; color: #64748b; margin-top: 18px;">
+        Approving will immediately activate the account and email the user with access details.
+      </p>
+    </div>
+    <div style="background-color: #090d16; padding: 16px 24px; text-align: center; font-size: 11px; color: #475569; border-top: 1px solid #1e293b;">
+      &copy; {datetime.now(timezone.utc).year} RetainAI Platform &bull; Security &amp; Compliance
+    </div>
+  </div>
+</body>
+</html>
+"""
+    ok, detail = _send_smtp_email(ADMIN_APPROVAL_EMAIL, subject, plain_body, html_body)
+    if not ok:
+        logging.warning(f"[APPROVAL] Could not send admin approval email to {ADMIN_APPROVAL_EMAIL}: {detail}")
+    else:
+        logging.info(f"[APPROVAL] Admin approval email for {user_email} sent to {ADMIN_APPROVAL_EMAIL}.")
+    return ok, detail
+
+
+def _send_user_approved_email(user_email: str) -> tuple[bool, str]:
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+    login_url = f"{frontend_url}/"
+    subject = "Your RetainAI account has been approved!"
+    plain_body = f"""Welcome to RetainAI!
+
+Your account ({user_email}) has been approved by the administrator.
+You can now log in to access your RetainAI dashboard:
+{login_url}
+
+— RetainAI Team
+"""
+    html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Account Approved — RetainAI</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #e2e8f0; margin: 0; padding: 30px 15px;">
+  <div style="max-width: 520px; margin: 0 auto; background-color: #0f172a; border: 1px solid #334155; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
+    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 26px 24px; text-align: center;">
+      <h1 style="margin: 0; font-size: 26px; color: #ffffff; font-weight: 800; letter-spacing: -0.5px;">RetainAI</h1>
+      <p style="margin: 6px 0 0 0; color: #d1fae5; font-size: 13px;">Account Activated</p>
+    </div>
+    <div style="padding: 30px 26px; text-align: center;">
+      <div style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 12px;">
+        &#127881; Your Account is Approved!
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 24px;">
+        Great news! The administrator has approved your RetainAI account request for <strong style="color: #38bdf8;">{user_email}</strong>. You now have full access to the platform.
+      </p>
+      <div style="margin: 28px 0 20px;">
+        <a href="{login_url}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%); color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 13px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);">
+          Log In to RetainAI &rarr;
+        </a>
+      </div>
+      <p style="font-size: 12px; color: #64748b; margin-top: 14px;">
+        Direct link: <a href="{login_url}" style="color: #38bdf8;">{login_url}</a>
+      </p>
+    </div>
+    <div style="background-color: #090d16; padding: 16px 24px; text-align: center; font-size: 11px; color: #475569; border-top: 1px solid #1e293b;">
+      &copy; {datetime.now(timezone.utc).year} RetainAI Platform. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+"""
+    return _send_smtp_email(user_email, subject, plain_body, html_body)
+
+
+def _send_user_rejected_email(user_email: str) -> tuple[bool, str]:
+    subject = "RetainAI Account Registration Update"
+    plain_body = f"""Hello,
+
+Your account request for RetainAI ({user_email}) was reviewed and has not been approved at this time.
+If you believe this was in error, please contact your organization administrator.
+
+— RetainAI Team
+"""
+    html_body = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0f19; color: #e2e8f0; padding: 30px 15px;">
+  <div style="max-width: 500px; margin: 0 auto; background-color: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 28px; text-align: center;">
+    <h2 style="color: #f87171; margin-top: 0;">Account Request Update</h2>
+    <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
+      Your account registration request for <strong style="color: #f1f5f9;">{user_email}</strong> was reviewed by the administrator and could not be approved at this time.
+    </p>
+    <p style="color: #64748b; font-size: 12px; margin-top: 20px;">
+      If you feel this decision was made in error, please reach out directly to your organization administrator.
+    </p>
+  </div>
+</body>
+</html>
+"""
+    return _send_smtp_email(user_email, subject, plain_body, html_body)
+
+
 # ── Auth endpoints ───────────────────────────────────────────────────────
 class UserCreate(BaseModel):
     email: EmailStr
@@ -369,14 +553,21 @@ def signup(user: UserCreate):
         is_test_env = os.environ.get("ENV") == "test"
 
         if existing:
-            if getattr(existing, "is_verified", True):
-                raise HTTPException(400, "Email already registered")
+            if getattr(existing, "is_verified", True) and getattr(existing, "is_approved", True):
+                raise HTTPException(400, "Email already registered and approved. Please sign in.")
+            if getattr(existing, "is_verified", True) and not getattr(existing, "is_approved", True):
+                raise HTTPException(
+                    400,
+                    f"Your email is already verified. Your account is pending administrator approval ({ADMIN_APPROVAL_EMAIL}).",
+                )
 
             code = _generate_verification_code()
             expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
             existing.hashed_password = hash_password(user.password)
             existing.verification_code = code
             existing.verification_code_expires_at = expires_at
+            if not existing.approval_token:
+                existing.approval_token = secrets.token_urlsafe(32)
             db.commit()
 
             email_sent, detail = _send_verification_email(user_email, code)
@@ -385,6 +576,7 @@ def signup(user: UserCreate):
                 "email": user_email,
                 "role": existing.role,
                 "requires_verification": True,
+                "requires_approval": not getattr(existing, "is_approved", False),
             }
             if not email_sent:
                 resp["debug_code"] = code
@@ -406,8 +598,10 @@ def signup(user: UserCreate):
         code = _generate_verification_code()
         expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
 
-        # In automated test suite, default to pre-verified so existing tests pass
+        # In automated test suite or admin emails, auto-verify and auto-approve
         auto_verify = is_test_env
+        auto_approved = is_test_env or (user_email in ADMIN_EMAILS)
+        approval_token = secrets.token_urlsafe(32)
 
         new_user = User(
             email=user_email,
@@ -416,6 +610,8 @@ def signup(user: UserCreate):
             is_verified=auto_verify,
             verification_code=None if auto_verify else code,
             verification_code_expires_at=None if auto_verify else expires_at,
+            is_approved=auto_approved,
+            approval_token=None if auto_approved else approval_token,
         )
         db.add(new_user)
         db.commit()
@@ -430,6 +626,7 @@ def signup(user: UserCreate):
             "email": user_email,
             "role": role,
             "requires_verification": not auto_verify,
+            "requires_approval": not auto_approved,
         }
         if not auto_verify and not email_sent:
             resp["debug_code"] = code
@@ -447,14 +644,27 @@ def _process_verification(db, email: str, code: str) -> dict:
     if not user:
         raise HTTPException(404, "No account found with this email.")
 
+    is_approved = getattr(user, "is_approved", False)
+
     if getattr(user, "is_verified", False):
-        return {
-            "message": "Account already verified. Welcome back!",
-            "access_token": create_access_token(user.email),
-            "token_type": "bearer",
-            "role": user.role,
-            "is_verified": True,
-        }
+        if is_approved:
+            return {
+                "message": "Account already verified. Welcome back!",
+                "access_token": create_access_token(user.email),
+                "token_type": "bearer",
+                "role": user.role,
+                "is_verified": True,
+                "is_approved": True,
+            }
+        else:
+            return {
+                "message": f"Your email is verified. Your account is currently pending administrator approval ({ADMIN_APPROVAL_EMAIL}).",
+                "email": user.email,
+                "role": user.role,
+                "is_verified": True,
+                "is_approved": False,
+                "requires_approval": True,
+            }
 
     if not user.verification_code:
         raise HTTPException(400, "No pending verification code found. Please request a new code.")
@@ -474,14 +684,34 @@ def _process_verification(db, email: str, code: str) -> dict:
     user.is_verified = True
     user.verification_code = None
     user.verification_code_expires_at = None
+
+    if is_approved:
+        db.commit()
+        return {
+            "message": "Account verified successfully! Welcome to RetainAI.",
+            "access_token": create_access_token(user.email),
+            "token_type": "bearer",
+            "role": user.role,
+            "is_verified": True,
+            "is_approved": True,
+        }
+
+    # User requires admin approval
+    if not user.approval_token:
+        user.approval_token = secrets.token_urlsafe(32)
     db.commit()
 
+    # Trigger admin approval email to sandeepkumar9837146@gmail.com
+    admin_sent, admin_detail = _send_admin_approval_request_email(user.email, user.approval_token)
+
     return {
-        "message": "Account verified successfully! Welcome to RetainAI.",
-        "access_token": create_access_token(user.email),
-        "token_type": "bearer",
+        "message": f"Email verified successfully! An approval request has been sent to the administrator ({ADMIN_APPROVAL_EMAIL}). You will receive an email once approved.",
+        "email": user.email,
         "role": user.role,
         "is_verified": True,
+        "is_approved": False,
+        "requires_approval": True,
+        "admin_email_sent": admin_sent,
     }
 
 
@@ -501,10 +731,17 @@ def verify_email_get(email: str, code: str):
     db = db_session()
     try:
         res = _process_verification(db, email, code)
-        token = res.get("access_token", "")
         frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
         from starlette.responses import RedirectResponse
-        return RedirectResponse(f"{frontend_url}/?token={token}&verified=true", status_code=303)
+        import urllib.parse
+        if res.get("is_approved"):
+            token = res.get("access_token", "")
+            return RedirectResponse(f"{frontend_url}/?token={token}&verified=true", status_code=303)
+        else:
+            return RedirectResponse(
+                f"{frontend_url}/?verified=true&pending_approval=true&email={urllib.parse.quote(email)}",
+                status_code=303,
+            )
     finally:
         db.close()
 
@@ -554,7 +791,170 @@ def login(form: OAuth2PasswordRequestForm = Depends()):
                 detail="Your account is not verified yet. Please check your inbox for the verification code.",
             )
 
+        if not getattr(user, "is_approved", True):
+            raise HTTPException(
+                403,
+                detail=f"Your email is verified, but your account is pending administrator approval ({ADMIN_APPROVAL_EMAIL}). You will receive an email once approved.",
+            )
+
         return {"access_token": create_access_token(user.email), "token_type": "bearer", "role": user.role}
+    finally:
+        db.close()
+
+
+@app.get("/admin/approve-account")
+def approve_account_get(token: str, email: str, action: str = "approve"):
+    from starlette.responses import HTMLResponse
+    user_email = email.strip().lower()
+    db = db_session()
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+    try:
+        user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            return HTMLResponse(
+                """<!DOCTYPE html><html><body style="font-family: sans-serif; background: #0f172a; color: #fff; padding: 40px; text-align: center;">
+                <h2>User not found</h2><p>No user account exists with this email address.</p>
+                </body></html>""", status_code=404
+            )
+
+        if action == "approve":
+            if getattr(user, "is_approved", False):
+                html = f"""<!DOCTYPE html>
+<html>
+<head><title>RetainAI — Account Already Approved</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
+  <div style="max-width: 500px; width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+    <h2 style="color: #f8fafc; margin: 0 0 10px 0;">Account Already Approved</h2>
+    <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
+      The account for <strong style="color: #38bdf8;">{user.email}</strong> is already active and approved.
+    </p>
+    <a href="{frontend_url}" style="display: inline-block; background: #06b6d4; color: #020617; font-weight: 700; text-decoration: none; padding: 12px 28px; border-radius: 8px;">
+      Open RetainAI
+    </a>
+  </div>
+</body>
+</html>"""
+                return HTMLResponse(html)
+
+            if not user.approval_token or user.approval_token != token.strip():
+                return HTMLResponse(
+                    """<!DOCTYPE html><html><body style="font-family: sans-serif; background: #0f172a; color: #fff; padding: 40px; text-align: center;">
+                    <h2>Invalid or Expired Link</h2><p>This approval link is invalid or has already been used.</p>
+                    </body></html>""", status_code=400
+                )
+
+            user.is_approved = True
+            user.approval_token = None
+            db.commit()
+
+            _send_user_approved_email(user.email)
+
+            html = f"""<!DOCTYPE html>
+<html>
+<head><title>RetainAI — Account Approved</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
+  <div style="max-width: 520px; width: 100%; background: #0f172a; border: 1px solid #10b981; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);">
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 32px; margin-bottom: 16px;">✓</div>
+    <h2 style="color: #f8fafc; margin: 0 0 10px 0; font-size: 24px;">Account Approved!</h2>
+    <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 16px;">
+      User <strong style="color: #38bdf8;">{user.email}</strong> has been successfully approved and activated.
+    </p>
+    <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 28px;">
+      A confirmation email has been dispatched to <strong>{user.email}</strong> informing them that their account is ready to use.
+    </p>
+    <a href="{frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; font-weight: 700; text-decoration: none; padding: 13px 30px; border-radius: 8px;">
+      Go to RetainAI Dashboard &rarr;
+    </a>
+  </div>
+</body>
+</html>"""
+            return HTMLResponse(html)
+
+        elif action == "reject":
+            if not user.approval_token or user.approval_token != token.strip():
+                return HTMLResponse(
+                    """<!DOCTYPE html><html><body style="font-family: sans-serif; background: #0f172a; color: #fff; padding: 40px; text-align: center;">
+                    <h2>Invalid or Expired Link</h2><p>This action link is invalid or has already been used.</p>
+                    </body></html>""", status_code=400
+                )
+
+            _send_user_rejected_email(user.email)
+            user.is_approved = False
+            user.approval_token = None
+            db.delete(user)
+            db.commit()
+
+            html = f"""<!DOCTYPE html>
+<html>
+<head><title>RetainAI — Account Request Declined</title></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
+  <div style="max-width: 520px; width: 100%; background: #0f172a; border: 1px solid #ef4444; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);">
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 32px; margin-bottom: 16px;">✕</div>
+    <h2 style="color: #f8fafc; margin: 0 0 10px 0; font-size: 24px;">Request Declined</h2>
+    <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
+      The account request for <strong style="color: #f87171;">{user_email}</strong> has been rejected and the account removed.
+    </p>
+    <a href="{frontend_url}" style="display: inline-block; background: #334155; color: #f1f5f9; font-weight: 600; text-decoration: none; padding: 12px 28px; border-radius: 8px;">
+      Back to Dashboard
+    </a>
+  </div>
+</body>
+</html>"""
+            return HTMLResponse(html)
+        else:
+            raise HTTPException(400, "Unknown action")
+    finally:
+        db.close()
+
+
+@app.get("/admin/pending-users")
+def list_pending_users(current_admin: str = Depends(get_current_admin)):
+    db = db_session()
+    try:
+        users = db.query(User).filter(User.is_approved == False).all()
+        return {
+            "users": [
+                {
+                    "email": u.email,
+                    "role": u.role,
+                    "is_verified": u.is_verified,
+                    "is_approved": u.is_approved,
+                }
+                for u in users
+            ]
+        }
+    finally:
+        db.close()
+
+
+@app.post("/admin/users/{email}/approve")
+def approve_user_in_app(email: str, current_admin: str = Depends(get_current_admin)):
+    db = db_session()
+    try:
+        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        if not user:
+            raise HTTPException(404, "User not found")
+        user.is_approved = True
+        user.approval_token = None
+        db.commit()
+        _send_user_approved_email(user.email)
+        return {"message": f"User {user.email} approved successfully.", "email": user.email, "is_approved": True}
+    finally:
+        db.close()
+
+
+@app.post("/admin/users/{email}/reject")
+def reject_user_in_app(email: str, current_admin: str = Depends(get_current_admin)):
+    db = db_session()
+    try:
+        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        if not user:
+            raise HTTPException(404, "User not found")
+        _send_user_rejected_email(user.email)
+        db.delete(user)
+        db.commit()
+        return {"message": f"User {email} rejected and removed."}
     finally:
         db.close()
 
@@ -624,7 +1024,13 @@ def list_users(current_user: str = Depends(get_current_admin)):
         users = db.query(User).order_by(User.email).all()
         return {
             "users": [
-                {"email": u.email, "name": u.name or "", "role": u.role}
+                {
+                    "email": u.email,
+                    "name": u.name or "",
+                    "role": u.role,
+                    "is_verified": getattr(u, "is_verified", False),
+                    "is_approved": getattr(u, "is_approved", False),
+                }
                 for u in users
             ]
         }

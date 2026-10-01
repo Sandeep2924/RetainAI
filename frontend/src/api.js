@@ -289,4 +289,19 @@ export async function sendEmailDraft(id) {
   return data;
 }
 
+export async function fetchPendingUsers() {
+  const { data } = await client.get("/admin/pending-users");
+  return data;
+}
+
+export async function approveUser(email) {
+  const { data } = await client.post(`/admin/users/${encodeURIComponent(email)}/approve`);
+  return data;
+}
+
+export async function rejectUser(email) {
+  const { data } = await client.post(`/admin/users/${encodeURIComponent(email)}/reject`);
+  return data;
+}
+
 export default client;
