@@ -80,7 +80,7 @@ ENV = os.environ.get("ENV", "production").lower()
 SECRET_KEY = os.environ.get("SECRET_KEY", "")
 ALGORITHM = "HS256"
 DEFAULT_HIGH_RISK_THRESHOLD = 0.7  # used until an admin overrides it via /settings/app
-SCORING_INTERVAL_SECONDS = int(os.environ.get("SCORING_INTERVAL_SECONDS", "15"))
+SCORING_INTERVAL_SECONDS = int(os.environ.get("SCORING_INTERVAL_SECONDS", "60"))
 # Emails in this list get "admin" role automatically on signup. Comma-separated.
 ADMIN_EMAILS = {
     e.strip().lower() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()
@@ -2389,5 +2389,5 @@ def trigger_snapshot(current_user: str = Depends(get_current_admin)):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", "8000"))
+    port = int(os.environ.get("PORT", "8001"))
     uvicorn.run(app, host="0.0.0.0", port=port)
