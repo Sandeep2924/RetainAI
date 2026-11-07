@@ -9,6 +9,7 @@ import {
 } from "../api";
 import RiskMeter from "../components/RiskMeter";
 import RiskBadge from "../components/RiskBadge";
+import CopyButton from "../components/CopyButton";
 import { driverLabel } from "../risk";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell,
@@ -141,8 +142,10 @@ export default function CustomerDetail({ customerId, onBack, isAdmin, onGenerate
           </div>
           <p className="text-slate-400 mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
             <span className="flex items-center gap-1.5"><Mail className="w-4 h-4 shrink-0" /> {detail.email}</span>
+            <CopyButton text={detail.email} size={12} title="Copy email address" />
             <span className="hidden sm:inline mx-1 opacity-30">|</span>
             <span className="font-mono text-xs opacity-70 bg-slate-900/60 px-2 py-0.5 rounded border border-slate-700/50">{detail.customer_id}</span>
+            <CopyButton text={detail.customer_id} size={12} title="Copy customer ID" />
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 bg-slate-900/50 p-3.5 sm:p-4 rounded-xl border border-slate-700/50">

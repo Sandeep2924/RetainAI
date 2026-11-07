@@ -4,6 +4,7 @@ import {
   fetchPlans, fetchSubscription, updateSubscription,
 } from "../api";
 import { setRiskThresholds } from "../risk";
+import { Eye, EyeOff } from "lucide-react";
 
 const TABS = ["General", "Notifications", "AI Model", "Billing", "Security", "Integrations"];
 
@@ -258,6 +259,9 @@ function SecurityTab() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
   const { notice, error, ok, fail } = useNotice();
 
@@ -288,20 +292,107 @@ function SecurityTab() {
   return (
     <div style={cardStyle}>
       <Banner notice={notice} error={error} />
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360 }}>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 380 }}>
         <div>
           <label style={labelStyle}>Current password</label>
-          <input type="password" style={inputStyle} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+          <div style={{ position: "relative" }}>
+            <input
+              type={showCurrent ? "text" : "password"}
+              style={{ ...inputStyle, paddingRight: 38 }}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Enter current password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+              }}
+              title={showCurrent ? "Hide" : "Show"}
+            >
+              {showCurrent ? <EyeOff style={{ width: 15, height: 15 }} /> : <Eye style={{ width: 15, height: 15 }} />}
+            </button>
+          </div>
         </div>
+
         <div>
           <label style={labelStyle}>New password</label>
-          <input type="password" style={inputStyle} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <div style={{ position: "relative" }}>
+            <input
+              type={showNew ? "text" : "password"}
+              style={{ ...inputStyle, paddingRight: 38 }}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="At least 8 characters"
+            />
+            <button
+              type="button"
+              onClick={() => setShowNew(!showNew)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+              }}
+              title={showNew ? "Hide" : "Show"}
+            >
+              {showNew ? <EyeOff style={{ width: 15, height: 15 }} /> : <Eye style={{ width: 15, height: 15 }} />}
+            </button>
+          </div>
         </div>
+
         <div>
           <label style={labelStyle}>Confirm new password</label>
-          <input type="password" style={inputStyle} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <div style={{ position: "relative" }}>
+            <input
+              type={showConfirm ? "text" : "password"}
+              style={{ ...inputStyle, paddingRight: 38 }}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repeat new password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+              }}
+              title={showConfirm ? "Hide" : "Show"}
+            >
+              {showConfirm ? <EyeOff style={{ width: 15, height: 15 }} /> : <Eye style={{ width: 15, height: 15 }} />}
+            </button>
+          </div>
         </div>
-        <button type="submit" disabled={saving} style={{ ...primaryBtnStyle, alignSelf: "flex-start" }}>
+
+        <button type="submit" disabled={saving} style={{ ...primaryBtnStyle, alignSelf: "flex-start", marginTop: 4 }}>
           {saving ? "Changing…" : "Change password"}
         </button>
       </form>

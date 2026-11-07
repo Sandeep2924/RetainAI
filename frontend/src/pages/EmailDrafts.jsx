@@ -11,6 +11,7 @@ import {
   sendEmailDraft,
 } from "../api";
 import { ChevronDown, Mail, Send, Loader2, Save, Trash2, Edit3, Settings } from 'lucide-react';
+import CopyButton from "../components/CopyButton";
 
 const TONES = ["professional", "friendly", "empathetic", "urgent"];
 const LENGTHS = ["short", "medium", "long"];
@@ -300,6 +301,14 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
                 <Send className="w-4 h-4" />
                 {sending ? "Sending…" : "Send"}
               </button>
+            )}
+            {body && (
+              <CopyButton
+                text={subject ? `Subject: ${subject}\n\n${body}` : body}
+                label="Copy text"
+                size={14}
+                style={{ padding: "10px 14px", fontSize: "14px", borderRadius: "8px" }}
+              />
             )}
             {activeDraftId && (
               <button

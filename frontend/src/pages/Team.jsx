@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 import { fetchTeam, updateUserRole, approveUser, rejectUser } from "../api";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function Team({ onBack, currentUserEmail }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyEmail, setBusyEmail] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    user: null,
+    title: "",
+    message: "",
+    confirmText: "Confirm",
+    variant: "danger",
+  });
 
   useEffect(() => {
     load();
@@ -42,15 +51,26 @@ export default function Team({ onBack, currentUserEmail }) {
     }
   }
 
-  async function handleReject(u) {
-    if (!window.confirm(`Are you sure you want to reject and remove ${u.email}?`)) {
-      return;
-    }
+  function requestReject(u) {
+    setConfirmModal({
+      isOpen: true,
+      user: u,
+      title: "Reject & Remove Account",
+      message: `Are you sure you want to reject and remove ${u.email}? This user account will be permanently deleted and cannot be undone.`,
+      confirmText: "Reject & Remove",
+      variant: "danger",
+    });
+  }
+
+  async function handleConfirmModal() {
+    const u = confirmModal.user;
+    if (!u) return;
     setBusyEmail(u.email);
     setError("");
     try {
       await rejectUser(u.email);
       setUsers((prev) => prev.filter((item) => item.email.toLowerCase() !== u.email.toLowerCase()));
+      setConfirmModal((prev) => ({ ...prev, isOpen: false, user: null }));
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't reject user.");
       if (err.response?.status === 404) {
@@ -220,7 +240,7 @@ export default function Team({ onBack, currentUserEmail }) {
                               Approve
                             </button>
                             <button
-                              onClick={() => handleReject(u)}
+                              onClick={() => requestReject(u)}
                               disabled={busyEmail === u.email}
                               style={{
                                 background: "rgba(239, 68, 68, 0.15)",
@@ -284,6 +304,17 @@ export default function Team({ onBack, currentUserEmail }) {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        variant={confirmModal.variant}
+        busy={busyEmail === confirmModal.user?.email}
+        onConfirm={handleConfirmModal}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false, user: null }))}
+      />
     </div>
   );
 }

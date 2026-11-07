@@ -11,6 +11,8 @@ import EmailDrafts from "./pages/EmailDrafts";
 import Reports from "./pages/Reports";
 import Predictions from "./pages/Predictions";
 import Settings from "./pages/Settings";
+import BackToTop from "./components/BackToTop";
+import SupportWidget from "./components/SupportWidget";
 import { Menu } from "lucide-react";
 
 export default function App() {
@@ -122,7 +124,7 @@ export default function App() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto scrollbar-thin p-3.5 sm:p-6 lg:p-8 min-w-0 w-full">
+        <main id="main-content" className="flex-1 overflow-y-auto scrollbar-thin p-3.5 sm:p-6 lg:p-8 min-w-0 w-full">
         {selectedCustomerId ? (
           <CustomerDetail
             customerId={selectedCustomerId}
@@ -159,6 +161,8 @@ export default function App() {
           />
         )}
         </main>
+        <BackToTop targetId="main-content" />
+        <SupportWidget currentUserEmail={user?.email} />
       </div>
     </div>
   );
