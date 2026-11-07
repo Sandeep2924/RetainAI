@@ -110,6 +110,24 @@ export default function Sidebar({
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
         </button>
+
+        <div className="flex items-center justify-center gap-3 pt-2 text-[11px] text-slate-500 border-t border-slate-800/60">
+          <button
+            type="button"
+            onClick={() => handleSelect("privacy")}
+            className="hover:text-cyan-400 transition-colors"
+          >
+            Privacy Policy
+          </button>
+          <span>·</span>
+          <button
+            type="button"
+            onClick={() => handleSelect("terms")}
+            className="hover:text-cyan-400 transition-colors"
+          >
+            Terms & Conditions
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-# 🛡️ RetainAI — Predictive Customer Retention & Churn Intelligence Platform
+# RetainAI | Predictive Customer Retention & Churn Intelligence Platform
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -278,23 +278,50 @@ Visit **[http://localhost:5173](http://localhost:5173)** in your browser!
 
 ---
 
-## 🌐 Production Deployment
+## Production Deployment
 
 ### Frontend on Vercel
 1. Import your GitHub repository into [Vercel](https://vercel.com).
 2. Set Root Directory to `./` (or `frontend`).
 3. Add Environment Variable:
    - `VITE_API_URL` = `https://your-backend-app.onrender.com`
-4. Deploy! Vercel handles automated builds via [`vercel.json`](vercel.json).
+4. Deploy: Vercel handles automated builds via [`vercel.json`](vercel.json).
+
+### Custom Domain Configuration (Vercel)
+To connect your custom domain (e.g. `retain.in` or `yourdomain.com`):
+1. In your **Vercel Project Dashboard**, navigate to **Settings > Domains**.
+2. Enter your domain (e.g. `yourdomain.com` and `www.yourdomain.com`).
+3. Add the following DNS records at your domain registrar (GoDaddy, Namecheap, Cloudflare, etc.):
+   - **Apex domain (`@`)**:
+     - Type: `A`
+     - Name: `@`
+     - Value: `76.76.21.21`
+   - **Subdomain (`www`)**:
+     - Type: `CNAME`
+     - Name: `www`
+     - Value: `cname.vercel-dns.com`
+4. Update backend CORS / allowed origins in Render:
+   - `ALLOWED_ORIGINS` = `https://yourdomain.com,https://www.yourdomain.com,http://localhost:5173`
+   - `FRONTEND_URL` = `https://yourdomain.com`
 
 ### Backend on Render
 1. Create a Web Service on [Render](https://render.com) using the included [`render.yaml`](render.yaml) blueprint.
 2. Fill in the environment variables (`DATABASE_URL`, `SMTP_*`, `ADMIN_APPROVAL_EMAIL`, `OPENAI_API_KEY`).
-3. Set `ALLOWED_ORIGINS` to include your Vercel domain: `https://retain-ai-olive.vercel.app,http://localhost:5173`.
+3. Set `ALLOWED_ORIGINS` to include your Vercel and custom domain: `https://retain-ai-olive.vercel.app,http://localhost:5173`.
 
 ---
 
-## 📡 Core API Reference
+## Legal & Compliance Pages
+
+RetainAI includes full enterprise compliance pages:
+- **Privacy Policy**: Details data processing, SHAP telemetry attribution, encryption standards, zero data brokering, and GDPR/CCPA subject access rights.
+- **Terms and Conditions**: Covers service level agreements, model prediction disclaimers, authorized team licensing, and account protection requirements.
+
+Both pages are accessible directly from the unauthenticated login screen as well as from the authenticated application console.
+
+---
+
+## Core API Reference
 
 | Method | Endpoint | Description | Access |
 |---|---|---|---|
@@ -312,7 +339,7 @@ Visit **[http://localhost:5173](http://localhost:5173)** in your browser!
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**.
-Developed with ❤️ by the **RetainAI Team**.
+Maintained by the RetainAI Team.

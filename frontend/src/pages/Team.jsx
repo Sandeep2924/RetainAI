@@ -128,7 +128,7 @@ export default function Team({ onBack, currentUserEmail }) {
               cursor: "pointer",
             }}
           >
-            {loading ? "Refreshing…" : "↻ Refresh"}
+            {loading ? "Refreshing…" : "Refresh"}
           </button>
           <button
             onClick={onBack}
@@ -183,7 +183,7 @@ export default function Team({ onBack, currentUserEmail }) {
                 const isVerified = u.is_verified !== false;
                 return (
                   <tr key={u.email} style={{ borderTop: "1px solid var(--border)" }}>
-                    <td style={{ padding: "10px" }}>{u.name || "—"}</td>
+                    <td style={{ padding: "10px" }}>{u.name || "-"}</td>
                     <td style={{ padding: "10px", wordBreak: "break-all" }}>
                       {u.email}
                       {isSelf && (

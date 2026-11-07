@@ -189,7 +189,7 @@ function NotificationsTab() {
         ))}
       </div>
       <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 16 }}>
-        These control what you'd receive — actual delivery depends on SMTP being configured (see Integrations tab).
+        These control what you'd receive: actual delivery depends on SMTP being configured (see Integrations tab).
       </p>
     </div>
   );
@@ -215,7 +215,7 @@ function AIModelTab({ isAdmin }) {
     try {
       const data = await updateAppSettings(threshold / 100);
       setRiskThresholds(data.high_risk_threshold);
-      ok("Saved — takes effect immediately across the dashboard.");
+      ok("Saved: takes effect immediately across the dashboard.");
       setSettings((prev) => ({ ...prev, high_risk_threshold: data.high_risk_threshold }));
     } catch (err) {
       fail(err.response?.data?.detail || "Couldn't save this setting.");
@@ -248,7 +248,7 @@ function AIModelTab({ isAdmin }) {
           <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 12 }}>Only admins can change this.</p>
         )}
         <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 16 }}>
-          Scoring runs every {settings.scoring_interval_seconds}s (set at server start — not editable here).
+          Scoring runs every {settings.scoring_interval_seconds}s (set at server start, not editable here).
         </p>
       </div>
     </div>
@@ -460,13 +460,13 @@ function BillingTab({ isAdmin }) {
       <div style={cardStyle}>
         <Banner notice={notice} error={error} />
         <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 16 }}>
-          One subscription covers this whole deployment — plans aren't per-person, they're shared account limits.
+          One subscription covers this whole deployment: plans aren't per-person, they're shared account limits.
           There's no live payment processor connected yet; switching plans here only changes which limits apply.
         </p>
         <div style={{ maxWidth: 420 }}>
           <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{sub.plan_name}</p>
           <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 16 }}>
-            {money(sub.price_cents_monthly)} · renews {sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : "—"}
+            {money(sub.price_cents_monthly)} · renews {sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : "N/A"}
           </p>
           <UsageBar label="Team seats" used={sub.seats_used} max={sub.max_seats} />
           <UsageBar label="Tracked customers" used={sub.tracked_customers} max={sub.max_tracked_customers} />
@@ -527,7 +527,7 @@ function IntegrationsTab() {
     <div style={cardStyle}>
       <Banner notice={notice} error={error} />
       <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 16 }}>
-        Status only — credentials are configured server-side via environment variables and are never exposed here.
+        Status only: credentials are configured server-side via environment variables and are never exposed here.
       </p>
       {!status ? (
         <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>Loading…</p>

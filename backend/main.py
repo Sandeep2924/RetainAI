@@ -453,7 +453,7 @@ You can now log in to access your RetainAI dashboard:
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Account Approved — RetainAI</title>
+  <title>Account Approved | RetainAI</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #e2e8f0; margin: 0; padding: 30px 15px;">
   <div style="max-width: 520px; margin: 0 auto; background-color: #0f172a; border: 1px solid #334155; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
@@ -463,7 +463,7 @@ You can now log in to access your RetainAI dashboard:
     </div>
     <div style="padding: 30px 26px; text-align: center;">
       <div style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 12px;">
-        &#127881; Your Account is Approved!
+        Your Account is Approved
       </div>
       <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 24px;">
         Great news! The administrator has approved your RetainAI account request for <strong style="color: #38bdf8;">{user_email}</strong>. You now have full access to the platform.
@@ -822,10 +822,10 @@ def approve_account_get(token: str, email: str, action: str = "approve"):
             if getattr(user, "is_approved", False):
                 html = f"""<!DOCTYPE html>
 <html>
-<head><title>RetainAI — Account Already Approved</title></head>
+<head><title>RetainAI | Account Already Approved</title></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
   <div style="max-width: 500px; width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 12px; display: block;"><polyline points="20 6 9 17 4 12"/></svg>
     <h2 style="color: #f8fafc; margin: 0 0 10px 0;">Account Already Approved</h2>
     <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
       The account for <strong style="color: #38bdf8;">{user.email}</strong> is already active and approved.
@@ -853,11 +853,13 @@ def approve_account_get(token: str, email: str, action: str = "approve"):
 
             html = f"""<!DOCTYPE html>
 <html>
-<head><title>RetainAI — Account Approved</title></head>
+<head><title>RetainAI | Account Approved</title></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
   <div style="max-width: 520px; width: 100%; background: #0f172a; border: 1px solid #10b981; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);">
-    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 32px; margin-bottom: 16px;">✓</div>
-    <h2 style="color: #f8fafc; margin: 0 0 10px 0; font-size: 24px;">Account Approved!</h2>
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: #10b981; margin: 0 auto 16px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="color: #f8fafc; margin: 0 0 10px 0; font-size: 24px;">Account Approved</h2>
     <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 16px;">
       User <strong style="color: #38bdf8;">{user.email}</strong> has been successfully approved and activated.
     </p>
@@ -870,7 +872,7 @@ def approve_account_get(token: str, email: str, action: str = "approve"):
   </div>
 </body>
 </html>"""
-            return HTMLResponse(html)
+                return HTMLResponse(html)
 
         elif action == "reject":
             if not user.approval_token or user.approval_token != token.strip():
@@ -888,10 +890,12 @@ def approve_account_get(token: str, email: str, action: str = "approve"):
 
             html = f"""<!DOCTYPE html>
 <html>
-<head><title>RetainAI — Account Request Declined</title></head>
+<head><title>RetainAI | Account Request Declined</title></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;">
   <div style="max-width: 520px; width: 100%; background: #0f172a; border: 1px solid #ef4444; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);">
-    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 32px; margin-bottom: 16px;">✕</div>
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.2); color: #ef4444; margin: 0 auto 16px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
     <h2 style="color: #f8fafc; margin: 0 0 10px 0; font-size: 24px;">Request Declined</h2>
     <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
       The account request for <strong style="color: #f87171;">{user_email}</strong> has been rejected and the account removed.
@@ -1764,7 +1768,7 @@ def _send_email_alert(high_risk_df: pd.DataFrame) -> tuple[bool, str]:
 <html>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px;">
   <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155;">
-    <h2 style="color: #f43f5e; margin-top: 0;">⚠️ RetainAI High-Risk Churn Alert</h2>
+    <h2 style="color: #f43f5e; margin-top: 0;">RetainAI High-Risk Churn Alert</h2>
     <p style="color: #94a3b8; font-size: 14px;"><strong>{count}</strong> customers are currently flagged as high churn risk.</p>
     <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px;">
       <thead>
@@ -2263,11 +2267,6 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
             <td style="background:linear-gradient(135deg,#0e7490 0%,#065f46 100%);padding:36px 32px;text-align:center">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <td style="text-align:center;padding-bottom:8px">
-                    <span style="font-size:32px">&#128202;</span>
-                  </td>
-                </tr>
-                <tr>
                   <td style="text-align:center">
                     <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.3">RetainAI Report Ready</h1>
                     <p style="margin:8px 0 0;color:#a5f3fc;font-size:14px;line-height:1.4">{report.name}</p>
@@ -2285,7 +2284,7 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
                   <td style="padding:12px 16px;border-bottom:1px solid #1e293b">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#128100; Generated by</td>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">Generated by</td>
                         <td style="color:#e2e8f0;font-size:13px;font-weight:600">{current_user}</td>
                       </tr>
                     </table>
@@ -2295,7 +2294,7 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
                   <td style="padding:12px 16px;border-bottom:1px solid #1e293b">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#128197; Generated on</td>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">Generated on</td>
                         <td style="color:#e2e8f0;font-size:13px;font-weight:600">{generated_at}</td>
                       </tr>
                     </table>
@@ -2305,7 +2304,7 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
                   <td style="padding:12px 16px">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">&#9989; Status</td>
+                        <td style="color:#64748b;font-size:12px;width:130px;white-space:nowrap">Status</td>
                         <td style="color:#10b981;font-size:13px;font-weight:700">{report.status.upper()}</td>
                       </tr>
                     </table>
@@ -2336,7 +2335,7 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
                 <tr>
                   <td style="padding:14px 18px">
                     <p style="margin:0;color:#6ee7b7;font-size:13px">
-                      &#128190;&nbsp;<strong>Excel file attached</strong> — Open the <em>.xlsx</em> attachment for the full dataset with multiple sheets.
+                      <strong>Excel file attached</strong>: Open the <em>.xlsx</em> attachment for the full dataset with multiple sheets.
                     </p>
                   </td>
                 </tr>
@@ -2384,7 +2383,7 @@ def email_report(report_id: int, req: EmailReportRequest, current_user: str = De
         attachment_filename = f"RetainAI_{safe_name}_{ts}.xlsx"
 
         ok, detail = _send_smtp_email_with_attachment(
-            req.to_email, f"📊 RetainAI Report: {report.name}",
+            req.to_email, f"RetainAI Report: {report.name}",
             plain_body, html_body, xlsx_bytes, attachment_filename
         )
         if not ok:
@@ -2496,7 +2495,7 @@ def send_scheduled_report(req: ScheduledReportRequest, current_user: str = Depen
 
         ts = datetime.utcnow().strftime("%Y%m%d")
         attachment_filename = f"RetainAI_{freq_label}_Bundle_{ts}.xlsx"
-        subject = f"📊 RetainAI {freq_label} Report Bundle — {datetime.utcnow().strftime('%b %d, %Y')}"
+        subject = f"RetainAI {freq_label} Report Bundle | {datetime.utcnow().strftime('%b %d, %Y')}"
 
         report_names_html = "".join(f"<li style='margin:4px 0;color:#94a3b8;font-size:13px'>{r.name}</li>" for r, _ in generated_reports)
 
@@ -2509,8 +2508,7 @@ def send_scheduled_report(req: ScheduledReportRequest, current_user: str = Depen
       <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;background-color:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155">
         <tr>
           <td style="background:linear-gradient(135deg,#0e7490 0%,#065f46 100%);padding:36px 32px;text-align:center">
-            <span style="font-size:36px">&#128202;</span>
-            <h1 style="margin:12px 0 0;color:#fff;font-size:22px;font-weight:800">{freq_label} Report Bundle</h1>
+            <h1 style="margin:0;color:#fff;font-size:22px;font-weight:800">{freq_label} Report Bundle</h1>
             <p style="margin:8px 0 0;color:#a5f3fc;font-size:14px">{datetime.utcnow().strftime('%B %d, %Y')}</p>
           </td>
         </tr>
@@ -2520,7 +2518,7 @@ def send_scheduled_report(req: ScheduledReportRequest, current_user: str = Depen
             <ul style="margin:0 0 20px;padding-left:20px">{report_names_html}</ul>
             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0c2a1a;border:1px solid #065f46;border-radius:10px;margin-bottom:24px">
               <tr><td style="padding:14px 18px">
-                <p style="margin:0;color:#6ee7b7;font-size:13px">&#128190;&nbsp;<strong>Excel bundle attached</strong> — Each report has its own summary tab plus detailed data sheets.</p>
+                <p style="margin:0;color:#6ee7b7;font-size:13px"><strong>Excel bundle attached</strong>: Each report has its own summary tab plus detailed data sheets.</p>
               </td></tr>
             </table>
             <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto">

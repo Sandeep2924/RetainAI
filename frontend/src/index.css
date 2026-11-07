@@ -3,7 +3,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm graphite instrument-panel base — deliberately not blue-black navy */
+  /* Warm graphite instrument-panel base: deliberately not blue-black navy */
   --bg-0: #16140f;
   --bg-1: #1e1b15;
   --bg-2: #26221a;
@@ -14,13 +14,13 @@
   --text-secondary: #b3a893;
   --text-muted: #756b58;
 
-  /* Muted verdigris/teal accent — cool contrast against the warm base, and
+  /* Muted verdigris/teal accent: cool contrast against the warm base, and
      deliberately NOT in the same family as any risk color, so "accent" and
      "risk signal" are never visually ambiguous. */
   --accent: #6ea8a0;
   --accent-dim: #23322f;
 
-  /* Brass/sage/rust risk ramp — analog-gauge vocabulary instead of stock
+  /* Brass/sage/rust risk ramp: analog-gauge vocabulary instead of stock
      traffic-light red/amber/green. */
   --risk-low: #8a9a6f;
   --risk-low-bg: #22271b;
@@ -33,7 +33,7 @@
   --radius-md: 8px;
   --radius-lg: 14px;
 
-  /* Reserved for the ONE hero moment (the high-risk stat) — not used on
+  /* Reserved for the ONE hero moment (the high-risk stat): not used on
      ordinary cards, so it stays meaningful instead of becoming another
      ambient decoration. */
   --glow-risk: 0 0 0 1px var(--border), 0 12px 32px -12px rgba(193, 84, 63, 0.35);
@@ -53,7 +53,7 @@ html, body, #root {
 
 body {
   margin: 0;
-  /* A quiet radial falloff instead of a flat fill — reads as an instrument
+  /* A quiet radial falloff instead of a flat fill: reads as an instrument
      panel with a light source, not a solid color swatch. */
   background:
     radial-gradient(1200px 700px at 14% -10%, rgba(110, 168, 160, 0.06), transparent 60%),
@@ -101,7 +101,7 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
-/* The single orchestrated motion moment for the whole app — a slow pulse on
+/* The single orchestrated motion moment for the whole app: a slow pulse on
    the sidebar's "live scoring" indicator. Nothing else animates on its own;
    everything else only responds to a person's action. */
 @keyframes live-pulse {

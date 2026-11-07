@@ -11,6 +11,8 @@ import EmailDrafts from "./pages/EmailDrafts";
 import Reports from "./pages/Reports";
 import Predictions from "./pages/Predictions";
 import Settings from "./pages/Settings";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 import BackToTop from "./components/BackToTop";
 import SupportWidget from "./components/SupportWidget";
 import { Menu } from "lucide-react";
@@ -118,7 +120,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-cyan-300 font-medium capitalize px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30">
+            <span className="text-xs text-cyan-300 font-medium capitalize px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/30">
               {view}
             </span>
           </div>
@@ -154,6 +156,10 @@ export default function App() {
           <Predictions onBack={() => setView("dashboard")} />
         ) : view === "settings" ? (
           <Settings onBack={() => setView("dashboard")} isAdmin={isAdmin} />
+        ) : view === "privacy" ? (
+          <PrivacyPolicy onBack={() => setView("dashboard")} />
+        ) : view === "terms" ? (
+          <TermsConditions onBack={() => setView("dashboard")} />
         ) : (
           <AllCustomers
             onSelectCustomer={openCustomer}

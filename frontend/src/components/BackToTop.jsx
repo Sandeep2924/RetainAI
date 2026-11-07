@@ -44,7 +44,7 @@ export default function BackToTop({ targetId = "main-content" }) {
         zIndex: 40,
         width: "42px",
         height: "42px",
-        borderRadius: "50%",
+        borderRadius: "8px",
         backgroundColor: "#1e293b",
         border: "1px solid rgba(6, 182, 212, 0.4)",
         color: "#38bdf8",

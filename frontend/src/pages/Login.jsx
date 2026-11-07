@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { login, signup, verifyEmail, resendVerification, setToken } from "../api";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check } from "lucide-react";
+import PrivacyPolicy from "./PrivacyPolicy";
+import TermsConditions from "./TermsConditions";
 
 export default function Login({ onAuthed }) {
   const params = new URLSearchParams(window.location.search);
@@ -15,6 +17,7 @@ export default function Login({ onAuthed }) {
       ? "verify"
       : "login"
   );
+  const [legalModal, setLegalModal] = useState(null);
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -164,9 +167,8 @@ export default function Login({ onAuthed }) {
         boxSizing: "border-box",
       }}
     >
-      {/* A faint decaying signal line — the one visual idea for this page,
-          echoing what the product actually does (watching a metric trend
-          down) instead of a decorative pattern with no connection to it. */}
+      {/* A faint decaying signal line: visually echoes what the product
+          actually does (watching a metric trend down). */}
       <svg
         aria-hidden="true"
         width="100%" height="100%"
@@ -234,7 +236,7 @@ export default function Login({ onAuthed }) {
                 color: mode === "signup" ? "#0b0f1a" : "#34d399",
                 fontSize: 10, fontWeight: 700
               }}>
-                {mode === "verify" ? "✓" : "1"}
+                {mode === "verify" ? <Check size={11} strokeWidth={3} /> : "1"}
               </span>
               <span>Credentials</span>
             </div>
@@ -260,18 +262,18 @@ export default function Login({ onAuthed }) {
             <div style={{
               width: 52, height: 52, borderRadius: "50%",
               background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)",
-              color: "#34d399", fontSize: 24, display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#34d399", display: "flex", alignItems: "center", justifyContent: "center",
               margin: "0 auto 4px"
             }}>
-              ✓
+              <Check size={28} strokeWidth={2.5} />
             </div>
             <div>
               <h3 style={{ margin: "0 0 6px 0", fontSize: 17, color: "var(--text-primary)" }}>
-                Email Verified Successfully!
+                Email Verified Successfully
               </h3>
               <span style={{
                 display: "inline-block", background: "rgba(14, 116, 144, 0.2)",
-                color: "#38bdf8", padding: "3px 10px", borderRadius: 9999,
+                color: "#38bdf8", padding: "3px 10px", borderRadius: 4,
                 fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase"
               }}>
                 Awaiting Admin Approval
@@ -286,7 +288,7 @@ export default function Login({ onAuthed }) {
               borderRadius: "var(--radius-sm)", padding: "12px 14px", fontSize: 12,
               color: "var(--text-muted)", textAlign: "left", lineHeight: 1.5
             }}>
-              📧 You will receive an email confirmation at <strong>{email}</strong> once your account has been approved. You can then return to sign in.
+              You will receive an email confirmation at <strong>{email}</strong> once your account has been approved. You can then return to sign in.
             </div>
             <button
               type="button"
@@ -535,7 +537,45 @@ export default function Login({ onAuthed }) {
             </button>
           </div>
         )}
+
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", gap: 14, fontSize: 12, color: "var(--text-muted)" }}>
+          <button
+            type="button"
+            onClick={() => setLegalModal("privacy")}
+            style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 12, cursor: "pointer", textDecoration: "underline", padding: 0 }}
+          >
+            Privacy Policy
+          </button>
+          <span>·</span>
+          <button
+            type="button"
+            onClick={() => setLegalModal("terms")}
+            style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 12, cursor: "pointer", textDecoration: "underline", padding: 0 }}
+          >
+            Terms & Conditions
+          </button>
+        </div>
       </div>
+
+      {legalModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 100,
+          background: "rgba(11, 15, 26, 0.94)",
+          backdropFilter: "blur(8px)",
+          overflowY: "auto",
+          padding: "32px 16px"
+        }}>
+          <div style={{ maxWidth: 860, margin: "0 auto" }}>
+            {legalModal === "privacy" ? (
+              <PrivacyPolicy onBack={() => setLegalModal(null)} />
+            ) : (
+              <TermsConditions onBack={() => setLegalModal(null)} />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

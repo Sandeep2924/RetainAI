@@ -142,7 +142,7 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
         
         <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3 z-30">
           {/* Status Badge */}
-          <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-slate-700">
+          <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border border-slate-700">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
@@ -226,7 +226,7 @@ export default function Dashboard({ onSelectCustomer, onViewAll, isAdmin }) {
           </div>
           <div className="flex items-baseline gap-2">
             <p className="text-4xl font-bold text-red-500">{summary.high_risk_count.toLocaleString()}</p>
-            <div className="flex items-center text-red-400 text-sm font-medium bg-red-500/10 px-2 py-1 rounded-full">
+            <div className="flex items-center text-red-400 text-sm font-medium bg-red-500/10 px-2 py-1 rounded-md">
               <TrendingDown className="w-4 h-4 mr-1" />
               Critical
             </div>

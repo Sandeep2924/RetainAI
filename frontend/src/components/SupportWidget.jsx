@@ -53,7 +53,7 @@ export default function SupportWidget({ currentUserEmail }) {
           border: "1px solid rgba(6, 182, 212, 0.45)",
           color: "#f8fafc",
           padding: "10px 16px",
-          borderRadius: "9999px",
+          borderRadius: "8px",
           cursor: "pointer",
           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.5)",
           transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",

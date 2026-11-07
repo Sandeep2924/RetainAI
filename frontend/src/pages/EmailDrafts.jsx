@@ -90,7 +90,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
       setNotice(
         result.source === "openai"
           ? "Generated with AI."
-          : "AI generation unavailable right now — used a fallback template instead."
+          : "AI generation unavailable right now: used a fallback template instead."
       );
     } catch {
       setError("Couldn't generate a draft. Is OPENAI_API_KEY configured on the backend?");
@@ -219,7 +219,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
               <option value="">Select a customer…</option>
               {customers.map((c) => (
                 <option key={c.customer_id} value={c.customer_id}>
-                  {c.name} — {Math.round(c.churn_risk_score * 100)}% risk
+                  {c.name} - {Math.round(c.churn_risk_score * 100)}% risk
                 </option>
               ))}
             </select>
@@ -267,7 +267,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Email body — generate with AI, or write your own."
+            placeholder="Email body: generate with AI, or write your own."
             rows={12}
             disabled={isSent}
             className="bg-slate-900/50 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-3 outline-none transition-all resize-y min-h-[180px] leading-relaxed disabled:opacity-50"
@@ -323,7 +323,7 @@ export default function EmailDrafts({ onBack, initialCustomerId }) {
           {selectedCustomerName && (
             <p className="text-xs text-slate-500 mt-2">
               Composing for {selectedCustomerName}
-              {isSent ? " — this draft has been sent and is now read-only." : ""}
+              {isSent ? " (this draft has been sent and is now read-only)." : ""}
             </p>
           )}
         </div>

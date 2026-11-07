@@ -1,7 +1,7 @@
 const TIER_COLOR = { low: "var(--risk-low)", medium: "var(--risk-mid)", high: "var(--risk-high)" };
 
 // Bucket labels now come from the backend with dynamic percentages, e.g.
-// "high (70-100%)" when the admin sets the threshold to 70% — so this reads
+// "high (70-100%)" when the admin sets the threshold to 70%: so this reads
 // the tier off the first word instead of matching a fixed string.
 function tierOf(label) {
   return label.split(" ")[0];

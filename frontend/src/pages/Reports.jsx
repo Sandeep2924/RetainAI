@@ -21,7 +21,10 @@ import {
   ShieldAlert,
   ChevronRight,
   Send,
-  ArrowLeft
+  ArrowLeft,
+  Clock,
+  Calendar,
+  CalendarDays
 } from 'lucide-react';
 import { generateReport, downloadReportCsv, emailReport, sendScheduledReport } from '../api';
 
@@ -30,7 +33,7 @@ const COLORS = {
   success: '#10b981',
   warning: '#f59e0b',
   danger: '#f43f5e',
-  purple: '#8b5cf6',
+  secondary: '#38bdf8',
   grid: '#334155',
   text: '#94a3b8',
   tooltipBg: '#1e293b',
@@ -103,9 +106,9 @@ const REPORT_TYPES = [
     title: 'Engagement & Usage Metrics',
     description: 'Raw data export of login frequencies, feature usage, and support ticket volumes.',
     icon: Users,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30'
+    color: 'text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    borderColor: 'border-amber-500/30'
   }
 ];
 
@@ -168,7 +171,7 @@ export default function Reports({ onBack }) {
         await downloadReportCsv(report.id, reportType);
         showToast('success', `CSV downloaded: ${report.name}`);
       } else if (type === 'pdf') {
-        // PDF: download as CSV (no PDF renderer yet) — clearly labelled
+        // PDF: download as CSV (no PDF renderer yet): clearly labelled
         await downloadReportCsv(report.id, reportType);
         showToast('success', `Report downloaded: ${report.name}`);
       }
@@ -372,7 +375,7 @@ export default function Reports({ onBack }) {
           <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 md:p-8">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">1. Select Report Types</h2>
-              <span className="text-sm font-medium px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full">
+              <span className="text-sm font-medium px-3 py-1 bg-slate-700/50 text-slate-300 rounded-md border border-slate-600/60">
                 {selectedReports.length} selected
               </span>
             </div>
@@ -506,8 +509,8 @@ export default function Reports({ onBack }) {
         {/* ── Scheduled Reports ──────────────────────────────────────── */}
         <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 sm:p-6 md:p-8">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
-            <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/30 shrink-0">
-              <Mail className="w-5 h-5 text-purple-400" />
+            <div className="p-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 shrink-0">
+              <Mail className="w-5 h-5 text-cyan-400" />
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-white">Scheduled Report Delivery</h2>
@@ -520,27 +523,30 @@ export default function Reports({ onBack }) {
             <p className="text-xs sm:text-sm font-semibold text-slate-300 mb-3">1. Choose Frequency</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               {[
-                { key: 'daily',   label: 'Daily',   icon: '⏱️', desc: 'Last 24 h snapshot' },
-                { key: 'weekly',  label: 'Weekly',  icon: '📅', desc: '7-day rolling view'  },
-                { key: 'monthly', label: 'Monthly', icon: '📆', desc: '30-day full summary'  },
-              ].map(f => (
-                <button
-                  key={f.key}
-                  type="button"
-                  onClick={() => setSchedFreq(f.key)}
-                  className={`flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 transition-all text-left w-full ${
-                    schedFreq === f.key
-                      ? 'border-purple-500 bg-purple-500/10 text-white'
-                      : 'border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-500 hover:text-slate-200'
-                  }`}
-                >
-                  <span className="text-xl shrink-0">{f.icon}</span>
-                  <div>
-                    <p className="font-semibold text-sm leading-none mb-1">{f.label}</p>
-                    <p className="text-xs text-slate-500">{f.desc}</p>
-                  </div>
-                </button>
-              ))}
+                { key: 'daily',   label: 'Daily',   icon: Clock, desc: 'Last 24h snapshot' },
+                { key: 'weekly',  label: 'Weekly',  icon: Calendar, desc: '7-day rolling view'  },
+                { key: 'monthly', label: 'Monthly', icon: CalendarDays, desc: '30-day full summary'  },
+              ].map(f => {
+                const FreqIcon = f.icon;
+                return (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setSchedFreq(f.key)}
+                    className={`flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 transition-all text-left w-full ${
+                      schedFreq === f.key
+                        ? 'border-cyan-500 bg-cyan-500/10 text-white'
+                        : 'border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                    }`}
+                  >
+                    <FreqIcon className="w-5 h-5 text-cyan-400 shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm leading-none mb-1">{f.label}</p>
+                      <p className="text-xs text-slate-500">{f.desc}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -581,7 +587,7 @@ export default function Reports({ onBack }) {
               value={schedEmail}
               onChange={e => setSchedEmail(e.target.value)}
               placeholder="recipient@company.com"
-              className="flex-1 bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-shadow text-sm"
+              className="flex-1 bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-shadow text-sm"
             />
             <button
               type="button"
@@ -605,7 +611,7 @@ export default function Reports({ onBack }) {
                   ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
                   : schedStatus === 'success'
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                  : 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-900/40'
+                  : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-900/40'
               }`}
             >
               {schedStatus === 'sending' && <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>}
@@ -787,7 +793,7 @@ export default function Reports({ onBack }) {
 
 function ActivityIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
       <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
     </svg>
   );

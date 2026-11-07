@@ -2,7 +2,7 @@ import { driverLabel } from "../risk";
 
 // Deliberately hand-rolled to match RiskDistributionChart's bar-and-legend
 // language exactly, rather than a recharts BarChart with its own axis/
-// tooltip chrome sitting right next to it — two dashboard charts that look
+// tooltip chrome sitting right next to it: two dashboard charts that look
 // like they came from different libraries was the actual "graphs differ
 // from each other" problem.
 const SHADE = ["var(--accent)", "#5c8f88", "#4d7a74", "#3f6560", "#33534e"];

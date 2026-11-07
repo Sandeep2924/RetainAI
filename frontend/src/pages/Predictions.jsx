@@ -89,7 +89,7 @@ export default function Predictions({ onBack }) {
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Batch Predictions</h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Upload a CSV to score a batch of customers with the live ML model — one-off run without modifying tracked roster.
+            Upload a CSV to score a batch of customers with the live ML model (one-off run without modifying tracked roster).
           </p>
         </div>
         <button onClick={onBack} className="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-700/60 text-slate-200 text-xs sm:text-sm font-medium transition-colors text-center">
@@ -104,7 +104,7 @@ export default function Predictions({ onBack }) {
           Required columns: {REQUIRED_COLS.map((c) => <code key={c} style={{ marginRight: 6 }}>{c}</code>)}
           <br />
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            <code>Last_Support_Ticket</code> can be a 0–10 number or free-text (e.g. the ticket subject) —
+            <code>Last_Support_Ticket</code> can be a 0-10 number or free-text (e.g. the ticket subject);
             text is scored for urgency automatically. Max 5MB / 5,000 rows.
           </span>
         </p>
@@ -248,7 +248,7 @@ function QuickPredictForm() {
       {result && (
         <p style={{ fontSize: 13, marginTop: 10 }}>
           <strong>{Math.round(result.churn_risk_score * 100)}%</strong> churn risk
-          {result.high_risk ? " (high risk)" : ""} — top driver: {result.top_driver}
+          {result.high_risk ? " (high risk)" : ""} | top driver: {result.top_driver}
         </p>
       )}
     </div>
